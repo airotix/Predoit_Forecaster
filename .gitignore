@@ -1,0 +1,50 @@
+# Large data files
+backend-ai/data/*.db
+backend-ai/data/raw/*.csv
+catboost_info/
+# Local environment configuration
+.env
+.env.local
+# Large local data files (GitHub 100 MB limit)
+backend-ai/forecast.db
+backend-ai/data/forecast.db
+backend-ai/data/raw/THE_FINAL_10Y_cleaned.csv
+backend-ai/data/joolan_sync/
+frontend/.next-dev/
+backend-ai/data/history.db
+backend-ai/data/history.db-journal
+backend-ai/data/history.db-wal
+backend-ai/data/history.db-shm
+backend-ai/data/joolan_source.db*
+backend-ai/data/joolan_live.db*
+backend-ai/data/raw/.fresh_joolan_pipeline.*
+backend-ai/test-results.txt
+backend-ai/fresh-test-results.txt
+backend-ai/stock-test-results.txt
+.env
+.env.*
+!.env.example
+backend-ai/output/automatic-*.log
+
+# Local dependencies, caches and generated client data
+node_modules/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+backend-ai/data/
+backend-ai/output/
+backend-ai/catboost_info/
+*.db
+*.db-wal
+*.db-shm
+*.db-journal
+
+# Retain the packaged deployment template and ignore generated build outputs.
+!.env.production.example
+!.env.*.example
+.next/
+.next-dev/
+*.egg-info/
+*.tsbuildinfo
+output/

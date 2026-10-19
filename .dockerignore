@@ -1,0 +1,36 @@
+# Keep the backend build context small and clean.
+.git
+.gitignore
+.venv
+**/.venv
+**/__pycache__
+**/*.pyc
+**/*.pyo
+
+# Frontend is built from its own context — never needed in the backend image.
+frontend
+
+# Legacy Node stub + committed deps + training logs.
+backend-ai/node_modules
+backend-ai/src
+backend-ai/__pycache__
+backend-ai/catboost_info
+**/node_modules
+**/.next
+
+# Local data & secrets — provided at runtime via volume / env, not baked in.
+.env
+.env.*
+!.env.example
+!.env.production.example
+backend-ai/data
+*.db
+*.db-wal
+*.db-shm
+
+# Docs / editor cruft
+docs
+*.md
+!README.md
+.vscode
+.idea

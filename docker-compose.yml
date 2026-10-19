@@ -1,0 +1,52 @@
+# Preduit full stack — local / self-hosted (VM) deployment.
+#
+#   1. cp .env.production.example .env   and edit it
+#   2. docker compose up --build
+#   3. frontend → http://localhost:3000   backend → http://localhost:4000
+#
+# The SQLite DB, pipeline outputs, and (optionally) the raw source CSV live on the
+# `preduit-data` volume so they survive restarts and rebuilds.
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: preduit-backend:latest
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env
+    environment:
+      # Container-local paths (override the legacy backend-ai/ anchor).
+      FORECASTER_DB_PATH: /data/forecast.db
+      FORECASTER_OUTPUT_DIR: /data/output
+      FORECASTER_API_RELOAD: "false"
+      # Allow the browser origin served by the frontend container.
+      FORECASTER_CORS_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000"
+    volumes:
+      - preduit-data:/data
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # NEXT_PUBLIC_* are baked in at build time. The API URL must be reachable
+        # from the user's BROWSER (not the docker network), hence localhost.
+        NEXT_PUBLIC_API_URL: "http://localhost:4000/api"
+        NEXT_PUBLIC_AUTH_ENABLED: "${NEXT_PUBLIC_AUTH_ENABLED:-false}"
+        NEXT_PUBLIC_AUTH_DEV_ROLE: "${NEXT_PUBLIC_AUTH_DEV_ROLE:-admin}"
+        NEXT_PUBLIC_AZURE_CLIENT_ID: "${NEXT_PUBLIC_AZURE_CLIENT_ID:-}"
+        NEXT_PUBLIC_AZURE_TENANT_ID: "${NEXT_PUBLIC_AZURE_TENANT_ID:-}"
+        NEXT_PUBLIC_AZURE_API_SCOPE: "${NEXT_PUBLIC_AZURE_API_SCOPE:-}"
+    image: preduit-frontend:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  preduit-data:

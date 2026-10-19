@@ -1,0 +1,772 @@
+"use client";
+import PlanningInputs from "@/components/setup/PlanningInputs";
+import { apiClient } from "@/lib/api/client";
+
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import JoolanImport from "@/components/setup/JoolanImport";
+import AppShell from "@/components/layout/AppShell";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Progress } from "@/components/ui/progress";
+import { useSeasonStore } from "@/store/seasonStore";
+import { useUIStore } from "@/store/uiStore";
+import { cn } from "@/lib/utils";
+import {
+  Settings,
+  Package,
+  Users,
+  Truck,
+  Check,
+  Upload,
+  Database,
+  Loader2,
+  RefreshCw,
+} from "lucide-react";
+import {
+  uploadFile,
+  syncERP,
+  triggerForecastRefresh,
+  getForecastJobStatus,
+  type ForecastJobStatus,
+} from "@/lib/api/ingest";
+
+type Step = 1 | 2 | 3 | 4;
+
+interface SeasonFormData {
+  name: string;
+  startDate: string;
+  endDate: string;
+  currency: string;
+  budget: string;
+  targetMargin: string;
+}
+
+interface ImportStatus {
+  type: "erp" | "csv" | null;
+  status: "idle" | "loading" | "success" | "error";
+  rowCount?: number;
+  rowsAdded?: number;
+  rowsUpdated?: number;
+  rowsSkipped?: number;
+  jobId?: string;
+  errors?: string[];
+}
+
+const steps = [
+  { id: 1 as Step, label: "Season Config", icon: Settings },
+  { id: 2 as Step, label: "Products", icon: Package },
+  { id: 3 as Step, label: "Customers", icon: Users },
+  { id: 4 as Step, label: "Supply Chain & Finance", icon: Truck },
+];
+
+const currencies = ["EUR", "USD", "GBP", "CHF", "JPY"];
+
+export default function SeasonSetupPage() {
+  const router = useRouter();
+  const { createSeason, setActiveSeason } = useSeasonStore();
+  const { addToast } = useUIStore();
+
+  const [currentStep, setCurrentStep] = useState<Step>(1);
+  const [completedSteps, setCompletedSteps] = useState<Set<Step>>(new Set());
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [formData, setFormData] = useState<SeasonFormData>({
+    name: "",
+    startDate: "",
+    endDate: "",
+    currency: "EUR",
+    budget: "",
+    targetMargin: "50",
+  });
+
+  const [productImport, setProductImport] = useState<ImportStatus>({
+    type: null,
+    status: "idle",
+  });
+
+  const [customerImport, setCustomerImport] = useState<ImportStatus>({
+    type: null,
+    status: "idle",
+  });
+
+
+
+
+  const productFileInputRef = useRef<HTMLInputElement>(null);
+  const customerFileInputRef = useRef<HTMLInputElement>(null);
+
+  const [forecastJob, setForecastJob] = useState<ForecastJobStatus | null>(null);
+  const [forecastPolling, setForecastPolling] = useState(false);
+  const [forecastLoading, setForecastLoading] = useState(false);
+  const [readiness,setReadiness] = useState<{ready:boolean;source:string;trainingCutoff:string|null;blockers:string[];warnings:string[]}|null>(null);
+  const [savedSeasonName,setSavedSeasonName] = useState("");
+  const checkReadiness = useCallback(async()=>{
+    try{setReadiness(await apiClient.get('/forecast/readiness'));}catch{setReadiness(null);}
+  },[]);
+  useEffect(()=>{void checkReadiness();},[checkReadiness]);
+
+  const loadForecastJob = useCallback(async () => {
+    try {
+      const s = await getForecastJobStatus();
+      setForecastJob(s);
+      if (s.status === "running") setForecastPolling(true);
+      else setForecastPolling(false);
+    } catch {
+      setForecastJob(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadForecastJob();
+  }, [loadForecastJob]);
+
+  useEffect(() => {
+    if (!forecastPolling) return;
+    const t = setInterval(() => {
+      loadForecastJob();
+    }, 3000);
+    return () => clearInterval(t);
+  }, [forecastPolling, loadForecastJob]);
+
+  const updateFormData = (field: keyof SeasonFormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const isStep1Valid = () => {
+    return (
+      formData.name.trim() !== "" &&
+      formData.startDate !== "" &&
+      formData.endDate !== "" &&
+      formData.budget !== "" &&
+      Number.isFinite(parseFloat(formData.budget)) && parseFloat(formData.budget) >= 0 &&
+      formData.targetMargin !== "" &&
+      Number.isFinite(parseFloat(formData.targetMargin)) && parseFloat(formData.targetMargin) >= 0 &&
+      formData.endDate >= formData.startDate &&
+      parseFloat(formData.targetMargin) <= 100
+    );
+  };
+
+  const isStep2Valid = () => productImport.status === "success";
+  const isStep3Valid = () => customerImport.status === "success";
+  const isStep4Valid = () => true; // Quantity planning can start before optional financial inputs.
+
+  const canProceedToNext = () => {
+    switch (currentStep) {
+      case 1: return isStep1Valid();
+      case 2: return isStep2Valid();
+      case 3: return isStep3Valid();
+      case 4: return isStep4Valid();
+      default: return false;
+    }
+  };
+
+  const completeCurrentStep = () => {
+    setCompletedSteps((prev) => new Set([...prev, currentStep]));
+  };
+
+  const handleNext = () => {
+    if (canProceedToNext()) {
+      completeCurrentStep();
+      if (currentStep < 4) {
+        setCurrentStep((currentStep + 1) as Step);
+      }
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep((currentStep - 1) as Step);
+    }
+  };
+
+  const runErpImport = async (
+    setImport: React.Dispatch<React.SetStateAction<ImportStatus>>
+  ) => {
+    setImport({ type: "erp", status: "loading" });
+    try {
+      const res = await syncERP();
+      setImport({
+        type: "erp",
+        status: "success",
+        rowsAdded: res.rowsAdded,
+        rowsUpdated: res.rowsUpdated,
+        rowsSkipped: res.rowsSkipped,
+        jobId: res.jobId,
+      });
+    } catch (e) {
+      setImport({
+        type: "erp",
+        status: "error",
+        errors: [e instanceof Error ? e.message : "ERP sync failed"],
+      });
+    }
+  };
+
+  const runFileImport = async (
+    file: File,
+    setImport: React.Dispatch<React.SetStateAction<ImportStatus>>
+  ) => {
+    setImport({ type: "csv", status: "loading" });
+    try {
+      const res = await uploadFile(file);
+      setImport({
+        type: "csv",
+        status: "success",
+        rowsAdded: res.rowsAdded,
+        rowsUpdated: res.rowsUpdated,
+        rowsSkipped: res.rowsSkipped,
+        jobId: res.jobId,
+      });
+    } catch (e) {
+      setImport({
+        type: "csv",
+        status: "error",
+        errors: [e instanceof Error ? e.message : "Upload failed"],
+      });
+    }
+  };
+
+  const handleRefreshForecast = async () => {
+    setForecastLoading(true);
+    try {
+      await checkReadiness();
+      await triggerForecastRefresh();
+      setForecastPolling(true);
+      await loadForecastJob();
+      addToast({
+        type: "success",
+        title: "Forecast refresh started",
+        message: "Full ML pipeline is running in the background.",
+      });
+    } catch (e) {
+      addToast({
+        type: "error",
+        title: "Could not start forecast refresh",
+        message: e instanceof Error ? e.message : "Unknown error",
+      });
+    } finally {
+      setForecastLoading(false);
+    }
+  };
+
+  const handleSaveSeason = async()=>{
+    if(!isStep1Valid())return;
+    setIsSubmitting(true);
+    try{
+      const season=await createSeason({name:formData.name,startDate:formData.startDate,endDate:formData.endDate,
+        currency:formData.currency,budget:parseFloat(formData.budget),targetMargin:parseFloat(formData.targetMargin)});
+      setSavedSeasonName(season.name);completeCurrentStep();await checkReadiness();
+      addToast({type:'success',title:'Season saved',message:'Select the combined source, check readiness and refresh forecasts.'});
+    }catch(error){addToast({type:'error',title:'Could not save season',message:error instanceof Error?error.message:'Unknown error'});}
+    finally{setIsSubmitting(false);}
+  };
+
+  const handleCompleteSetup = async () => {
+    if (!canProceedToNext()) return;
+
+    setIsSubmitting(true);
+    try {
+      completeCurrentStep();
+
+      const season = await createSeason({
+        name: formData.name,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        currency: formData.currency,
+        budget: parseFloat(formData.budget),
+        targetMargin: parseFloat(formData.targetMargin),
+      });
+
+      setActiveSeason(season);
+
+      addToast({
+        type: "success",
+        title: "Season created",
+        message: `${season.name} has been initialized. Redirecting to dashboard...`,
+      });
+
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1500);
+    } catch (error) {
+      addToast({
+        type: "error",
+        title: "Failed to create season",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const allStepsComplete =
+    completedSteps.has(1) &&
+    completedSteps.has(2) &&
+    completedSteps.has(3) &&
+    isStep4Valid();
+
+  const progressPercent = (completedSteps.size / 4) * 100;
+
+  return (
+    <AppShell>
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Season Setup</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
+            Select stored history, save a planning season and check readiness before generating forecasts.
+          </p>
+        </div>
+
+        <JoolanImport />
+
+        {/* Progress */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between text-sm">
+            <span className="font-medium">Optional import wizard progress</span>
+            <span className="text-slate-500">{Math.round(progressPercent)}% complete</span>
+          </div>
+          <Progress value={progressPercent} className="h-2" />
+        </div>
+
+        {/* Step Indicators */}
+        <div className="flex items-center justify-between">
+          {steps.map((step, idx) => {
+            const Icon = step.icon;
+            const isActive = currentStep === step.id;
+            const isComplete = completedSteps.has(step.id);
+            const isAccessible = step.id <= currentStep || completedSteps.has((step.id - 1) as Step);
+
+            return (
+              <React.Fragment key={step.id}>
+                <button
+                  onClick={() => isAccessible && setCurrentStep(step.id)}
+                  disabled={!isAccessible}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2 rounded-lg transition-colors",
+                    isActive && "bg-blue-50 dark:bg-blue-950",
+                    isAccessible && !isActive && "hover:bg-slate-100 dark:hover:bg-slate-900",
+                    !isAccessible && "opacity-50 cursor-not-allowed"
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "flex h-8 w-8 items-center justify-center rounded-full border-2",
+                      isComplete
+                        ? "border-emerald-500 bg-emerald-500 text-white"
+                        : isActive
+                        ? "border-blue-500 bg-blue-500 text-white"
+                        : "border-slate-300 dark:border-slate-700"
+                    )}
+                  >
+                    {isComplete ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Icon className="h-4 w-4" />
+                    )}
+                  </div>
+                  <span
+                    className={cn(
+                      "text-sm font-medium hidden sm:block",
+                      isActive
+                        ? "text-blue-700 dark:text-blue-300"
+                        : "text-slate-600 dark:text-slate-400"
+                    )}
+                  >
+                    {step.label}
+                  </span>
+                </button>
+                {idx < steps.length - 1 && (
+                  <div
+                    className={cn(
+                      "flex-1 h-0.5 mx-2",
+                      completedSteps.has(step.id)
+                        ? "bg-emerald-500"
+                        : "bg-slate-200 dark:bg-slate-800"
+                    )}
+                  />
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
+
+        {/* Step Content */}
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              Step {currentStep}: {steps[currentStep - 1].label}
+            </CardTitle>
+            <CardDescription>
+              {currentStep === 1 && "Configure the basic season parameters"}
+              {currentStep === 2 && "Import product data from ERP or CSV"}
+              {currentStep === 3 && "Import customer data from ERP or CSV"}
+              {currentStep === 4 && "Configure supply chain and financial parameters"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Step 1: Season Config */}
+            {currentStep === 1 && (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="sm:col-span-2">
+                  <label className="text-sm font-medium">Season Name</label>
+                  <Input
+                    placeholder="e.g., AW 2025"
+                    value={formData.name}
+                    onChange={(e) => updateFormData("name", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Start Date</label>
+                  <Input
+                    type="date"
+                    value={formData.startDate}
+                    onChange={(e) => updateFormData("startDate", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">End Date</label>
+                  <Input
+                    type="date"
+                    value={formData.endDate}
+                    onChange={(e) => updateFormData("endDate", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Default Currency</label>
+                  <Select
+                    value={formData.currency}
+                    onValueChange={(v) => updateFormData("currency", v)}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {currencies.map((c) => (
+                        <SelectItem key={c} value={c}>
+                          {c}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Seasonal Buying Budget</label>
+                  <div className="relative mt-1">
+                    <span className="absolute left-3 top-2.5 text-sm text-slate-500">
+                      {formData.currency}
+                    </span>
+                    <Input
+                      type="number"
+                      placeholder="500000"
+                      value={formData.budget}
+                      onChange={(e) => updateFormData("budget", e.target.value)}
+                      className="pl-12"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Target Gross Margin %</label>
+                  <div className="relative mt-1">
+                    <Input
+                      type="number"
+                      placeholder="50"
+                      min="0"
+                      max="100"
+                      value={formData.targetMargin}
+                      onChange={(e) => updateFormData("targetMargin", e.target.value)}
+                      className="pr-8"
+                    />
+                    <span className="absolute right-3 top-2.5 text-sm text-slate-500">%</span>
+                  </div>
+                </div>
+                <div className="sm:col-span-2 space-y-2">
+                  <Button type="button" disabled={!isStep1Valid() || isSubmitting} onClick={()=>void handleSaveSeason()}>
+                    {isSubmitting?'Saving…':'Save season for forecasts'}
+                  </Button>
+                  {savedSeasonName&&<p role="status" className="text-sm">Saved {savedSeasonName}. You can run the model from the forecast section below.</p>}
+                  <p className="text-sm text-slate-500">Stored CSV/Joolan history supplies products and customers. Saving this season is enough to plan quantity forecasts; the legacy import wizard is optional. Enter zero budget if you are checking demand without a buying budget.</p>
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: Products Import */}
+            {currentStep === 2 && (
+              <div className="space-y-6">
+                <input
+                  ref={productFileInputRef}
+                  type="file"
+                  accept=".csv,.xlsx,.xls"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) void runFileImport(f, setProductImport);
+                    e.target.value = "";
+                  }}
+                />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Card
+                    className={cn(
+                      "cursor-pointer transition-all hover:border-blue-300",
+                      productImport.type === "erp" && "border-blue-500 bg-blue-50/50 dark:bg-blue-950/30"
+                    )}
+                    onClick={() =>
+                      productImport.status !== "loading" && void runErpImport(setProductImport)
+                    }
+                  >
+                    <CardContent className="flex flex-col items-center justify-center p-6 text-center">
+                      <Database className="h-10 w-10 text-blue-500 mb-3" />
+                      <h3 className="font-semibold">ERP Import</h3>
+                      <p className="text-sm text-slate-500 mt-1">
+                        Sync products from ERP (mock: sample rows from base dataset)
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card
+                    className={cn(
+                      "cursor-pointer transition-all hover:border-blue-300",
+                      productImport.type === "csv" && "border-blue-500 bg-blue-50/50 dark:bg-blue-950/30"
+                    )}
+                    onClick={() =>
+                      productImport.status !== "loading" && productFileInputRef.current?.click()
+                    }
+                  >
+                    <CardContent className="flex flex-col items-center justify-center p-6 text-center">
+                      <Upload className="h-10 w-10 text-emerald-500 mb-3" />
+                      <h3 className="font-semibold">File upload</h3>
+                      <p className="text-sm text-slate-500 mt-1">
+                        CSV or Excel with the same columns as the pipeline
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {productImport.status === "loading" && (
+                  <div className="flex items-center justify-center gap-3 py-8">
+                    <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                    <span className="text-slate-600 dark:text-slate-400">
+                      Importing products...
+                    </span>
+                  </div>
+                )}
+
+                {productImport.status === "error" && productImport.errors?.length ? (
+                  <div className="rounded-lg border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/30 p-4 text-sm text-red-800 dark:text-red-200">
+                    {productImport.errors[0]}
+                  </div>
+                ) : null}
+
+                {productImport.status === "success" && (
+                  <div className="rounded-lg border border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/30 p-4 space-y-2">
+                    <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300">
+                      <Check className="h-5 w-5 shrink-0" />
+                      <span className="font-medium">Facts tables updated (non-ML)</span>
+                    </div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 pl-7">
+                      Added <strong>{productImport.rowsAdded ?? 0}</strong>, updated{" "}
+                      <strong>{productImport.rowsUpdated ?? 0}</strong>, skipped{" "}
+                      <strong>{productImport.rowsSkipped ?? 0}</strong> (row-level changes across
+                      orders / history).
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Step 3: Customers Import */}
+            {currentStep === 3 && (
+              <div className="space-y-6">
+                <input
+                  ref={customerFileInputRef}
+                  type="file"
+                  accept=".csv,.xlsx,.xls"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) void runFileImport(f, setCustomerImport);
+                    e.target.value = "";
+                  }}
+                />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Card
+                    className={cn(
+                      "cursor-pointer transition-all hover:border-blue-300",
+                      customerImport.type === "erp" && "border-blue-500 bg-blue-50/50 dark:bg-blue-950/30"
+                    )}
+                    onClick={() =>
+                      customerImport.status !== "loading" && void runErpImport(setCustomerImport)
+                    }
+                  >
+                    <CardContent className="flex flex-col items-center justify-center p-6 text-center">
+                      <Database className="h-10 w-10 text-blue-500 mb-3" />
+                      <h3 className="font-semibold">ERP Import</h3>
+                      <p className="text-sm text-slate-500 mt-1">
+                        Same mock ERP sync (sample rows) — replace with real connector later
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card
+                    className={cn(
+                      "cursor-pointer transition-all hover:border-blue-300",
+                      customerImport.type === "csv" && "border-blue-500 bg-blue-50/50 dark:bg-blue-950/30"
+                    )}
+                    onClick={() =>
+                      customerImport.status !== "loading" && customerFileInputRef.current?.click()
+                    }
+                  >
+                    <CardContent className="flex flex-col items-center justify-center p-6 text-center">
+                      <Upload className="h-10 w-10 text-emerald-500 mb-3" />
+                      <h3 className="font-semibold">File upload</h3>
+                      <p className="text-sm text-slate-500 mt-1">
+                        CSV or Excel — transactional rows with Client, orders, etc.
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {customerImport.status === "loading" && (
+                  <div className="flex items-center justify-center gap-3 py-8">
+                    <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                    <span className="text-slate-600 dark:text-slate-400">
+                      Importing customer-related facts...
+                    </span>
+                  </div>
+                )}
+
+                {customerImport.status === "error" && customerImport.errors?.length ? (
+                  <div className="rounded-lg border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/30 p-4 text-sm text-red-800 dark:text-red-200">
+                    {customerImport.errors[0]}
+                  </div>
+                ) : null}
+
+                {customerImport.status === "success" && (
+                  <div className="rounded-lg border border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/30 p-4 space-y-2">
+                    <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300">
+                      <Check className="h-5 w-5 shrink-0" />
+                      <span className="font-medium">Facts tables updated (non-ML)</span>
+                    </div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 pl-7">
+                      Added <strong>{customerImport.rowsAdded ?? 0}</strong>, updated{" "}
+                      <strong>{customerImport.rowsUpdated ?? 0}</strong>, skipped{" "}
+                      <strong>{customerImport.rowsSkipped ?? 0}</strong>.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {currentStep===4&&<div className="space-y-4"><PlanningInputs/><p className="text-sm">You can create a quantity plan now. Financial approval becomes available after complete stock and costs are imported and forecasts are refreshed.</p></div>}
+          </CardContent>
+        </Card>
+
+        <Card className="border-slate-200 dark:border-slate-800">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <RefreshCw className="h-5 w-5" />
+              Refresh forecasts (ML pipeline)
+            </CardTitle>
+            <CardDescription>
+              Rebuild forecasts from the selected combined, Joolan or CSV data source. Imports update source
+              data; this job refreshes forecasts and recommendations.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="text-sm text-slate-600 dark:text-slate-400 space-y-1">
+              <Button type="button" variant="outline" disabled={forecastLoading} onClick={()=>void checkReadiness()}>Check forecast readiness</Button>
+              {readiness&&<div className="space-y-1">
+                <p>Source: <strong>{readiness.source}</strong>. Training cutoff: <strong>{readiness.trainingCutoff||'Not available'}</strong>.</p>
+                <p role="status">{readiness.ready?'Ready to generate demand forecasts.':'Complete these items before running:'}</p>
+                {readiness.blockers.map(item=><p key={item} className="text-red-600">{item}</p>)}
+                {readiness.warnings.map(item=><p key={item} className="text-xs">{item}</p>)}
+              </div>}
+              <p>
+                Job status:{" "}
+                <strong className="text-foreground">
+                  {forecastJob?.status ?? "idle"}
+                </strong>
+              </p>
+              <p>
+                Last pipeline run:{" "}
+                <strong className="text-foreground">
+                  {forecastJob?.lastRun
+                    ? new Date(forecastJob.lastRun).toLocaleString()
+                    : "—"}
+                </strong>
+              </p>
+              {forecastJob?.errorMessage && forecastJob.status === "error" ? (
+                <p className="text-red-600 dark:text-red-400 text-xs max-w-xl break-words">
+                  {forecastJob.errorMessage.slice(0, 500)}
+                </p>
+              ) : null}
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void handleRefreshForecast()}
+              disabled={forecastLoading || forecastJob?.status === "running"}
+            >
+              {forecastLoading || forecastJob?.status === "running" ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Running…
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Refresh forecasts
+                </>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Navigation */}
+        <div className="flex items-center justify-between">
+          <Button
+            variant="outline"
+            onClick={handleBack}
+            disabled={currentStep === 1}
+          >
+            Back
+          </Button>
+
+          <div className="flex items-center gap-3">
+            {currentStep < 4 ? (
+              <Button onClick={handleNext} disabled={!canProceedToNext()}>
+                Continue
+              </Button>
+            ) : (
+              <Button
+                onClick={handleCompleteSetup}
+                disabled={!allStepsComplete || isSubmitting}
+                className="bg-emerald-600 hover:bg-emerald-700"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Initializing...
+                  </>
+                ) : (
+                  "Complete Setup"
+                )}
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+    </AppShell>
+  );
+}

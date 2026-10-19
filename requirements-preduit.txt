@@ -1,0 +1,3 @@
+# Install from the repository root (Forecaster-orgy/).
+-e ./preduit-engine
+-e ./preduit-app
