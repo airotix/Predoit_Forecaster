@@ -9,7 +9,50 @@ const config: Config = {
   ],
   theme: {
   	extend: {
+  		fontFamily: {
+  			sans: ['var(--font-ui)', 'Outfit', 'system-ui', 'sans-serif'],
+  			display: ['var(--font-display)', 'Sora', 'system-ui', 'sans-serif'],
+  			mono: ['var(--font-mono)', 'ui-monospace', 'monospace']
+  		},
+  		boxShadow: {
+  			card: 'var(--shadow-sm)',
+  			lift: 'var(--shadow-md)',
+  			brand: 'var(--shadow-primary)'
+  		},
   		colors: {
+  			page: 'var(--page)',
+  			soft: 'var(--soft)',
+  			line: 'var(--line)',
+  			chrome: 'var(--chrome)',
+  			champagne: 'var(--champagne)',
+  			'fg-1': 'var(--fg-1)',
+  			'fg-2': 'var(--fg-2)',
+  			'fg-3': 'var(--fg-3)',
+  			'fg-4': 'var(--neutral-400)',
+  			'border-strong': 'var(--border-strong)',
+  			brand: {
+  				DEFAULT: 'var(--brand)',
+  				hover: 'var(--brand-hover)',
+  				soft: 'var(--brand-soft)',
+  				'50': 'var(--orange-50)',
+  				'200': 'var(--orange-200)',
+  				'700': 'var(--orange-700)',
+  				'800': 'var(--orange-800)',
+  				tile: 'var(--orange-tile)'
+  			},
+  			success: {
+  				'50': 'var(--green-50)',
+  				'400': 'var(--green-400)',
+  				'600': 'var(--green-600)'
+  			},
+  			plum: {
+  				'50': 'var(--purple-50)',
+  				'600': 'var(--purple-600)'
+  			},
+  			danger: {
+  				DEFAULT: 'var(--danger)',
+  				soft: 'var(--danger-soft)'
+  			},
   			background: 'var(--background)',
   			foreground: 'var(--foreground)',
   			card: {

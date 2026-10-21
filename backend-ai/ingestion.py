@@ -9,6 +9,7 @@ import datetime
 import os
 import uuid
 from pathlib import Path
+import paths
 from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
@@ -23,7 +24,7 @@ from m1_data_preparation import (
     parse_order_dates,
 )
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = paths.HOME
 
 
 def _ingest_append_path() -> Path:

@@ -4,26 +4,20 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import AppShell from "@/components/layout/AppShell";
 import { ConfidenceBadge } from "@/components/shared";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { BrandButton } from "@/components/ui/brand-button";
+import { Notice, PageHeader, SelectField, TextField } from "@/components/ui/brand";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import {
-  Search,
-  ArrowUpDown,
-  ArrowRight,
-} from "lucide-react";
+  ArrowRightIcon,
+  ArrowsDownUpIcon,
+  CaretDownIcon,
+  ClockCounterClockwiseIcon,
+  MagnifyingGlassIcon,
+  SortAscendingIcon,
+  SortDescendingIcon,
+} from "@phosphor-icons/react";
 import { ProductStatus, ConfidenceLevel } from "@/types";
 import { fetchProducts, type ProductRow } from "@/lib/api/forecast";
 import { useSeasonStore } from "@/store/seasonStore";
@@ -39,12 +33,31 @@ interface ProductKPIRow extends Omit<ProductRow,'status'|'aiConfidence'> {
 }
 
 const statusColors: Record<ProductStatus, string> = {
-  new: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
-  "carry-over": "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300",
-  core: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300",
+  new: "bg-plum-50 text-plum-600",
+  "carry-over": "bg-brand-50 text-brand-800",
+  core: "bg-success-50 text-success-600",
 };
 
 type SortField = "diffusionRate" | "reorderRate" | "totalUnitsSold" | "depthPerCustomer";
+
+const TH = "px-3.5 py-3 text-[11px] font-bold uppercase tracking-[0.1em] text-fg-3";
+
+function StatusPill({ status, className }: { status: ProductStatus; className?: string }) {
+  return (
+    <span className={cn("inline-flex whitespace-nowrap rounded-full px-2.5 py-[3px] text-xs font-bold", statusColors[status], className)}>
+      {status}
+    </span>
+  );
+}
+
+function MetricTile({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1.5 rounded-[18px] bg-soft px-[18px] py-4">
+      <p className="text-[13px] text-fg-3">{label}</p>
+      <p className="font-display text-[26px] font-bold tabular-nums">{value}</p>
+    </div>
+  );
+}
 
 export default function ProductKPIsPage() {
   const [products, setProducts] = useState<ProductKPIRow[]>([]);
@@ -138,258 +151,222 @@ export default function ProductKPIsPage() {
     }
   };
 
-  const SortableHeader = ({ field, label }: { field: SortField; label: string }) => (
-    <button
-      onClick={() => handleSort(field)}
-      className={cn(
-        "flex items-center gap-1 text-xs font-medium uppercase tracking-wide hover:text-slate-900 dark:hover:text-slate-100 transition-colors",
-        sortBy === field ? "text-blue-600 dark:text-blue-400" : "text-slate-500"
-      )}
-    >
-      {label}
-      <ArrowUpDown className="h-3 w-3" />
-    </button>
-  );
+  const SortableHeader = ({ field, label }: { field: SortField; label: string }) => {
+    const active = sortBy === field;
+    const SortIcon = !active ? ArrowsDownUpIcon : sortOrder === "desc" ? SortDescendingIcon : SortAscendingIcon;
+    return (
+      <button
+        type="button"
+        onClick={() => handleSort(field)}
+        className={cn(
+          "ml-auto flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.1em] transition-colors hover:text-fg-1",
+          active ? "text-brand-700" : "text-fg-3"
+        )}
+      >
+        {label}
+        <SortIcon weight={active ? "bold" : "regular"} className="h-3 w-3" />
+      </button>
+    );
+  };
 
   return (
     <AppShell>
-      <div className="space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Product KPI Explorer</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">
-            Recorded customer-order demand by article and colour, with published base forecasts shown separately.
-          </p>
+      <PageHeader
+        eyebrow="Insights"
+        title="Product KPI Explorer"
+        description="Recorded customer-order demand by article and colour, with published base forecasts shown separately."
+      />
+      {products.length>0&&(
+        <div className="flex items-start gap-3.5 rounded-[20px] border border-line bg-card px-5 py-[18px]">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-plum-50"><ClockCounterClockwiseIcon className="h-[19px] w-[19px] text-plum-600"/></span>
+          <div className="flex min-w-0 flex-col gap-1.5 text-sm leading-relaxed text-fg-2">
+            <p className="font-semibold text-fg-1">History: {products[0].historyStart||'unknown'} to {products[0].historyEnd||'unknown'}{products[0].ordersThrough?` · Joolan orders through ${products[0].ordersThrough}`:''}. Forecast: {products[0].forecastStart||'unknown'} to {products[0].forecastEnd||'unknown'}.</p>
+            <p className="text-pretty">{products[0].demandDefinition} Model training cutoff: {products[0].trainingCutoff||'unknown'}. KPI history includes recorded orders after that cutoff.</p>
+            <details className="group">
+              <summary className="flex cursor-pointer list-none items-center gap-1.5 self-start text-[13px] font-bold text-brand-700 [&::-webkit-details-marker]:hidden">How these KPIs work<CaretDownIcon weight="bold" className="h-3 w-3 transition-transform group-open:rotate-180"/></summary>
+              <p className="mt-2 text-pretty text-[13px] leading-[1.65]">Diffusion = customers buying this article/colour ÷ all customers in the published source history. Depth = historical booked demand ÷ buying customers. Reorder: {products[0].reorderDefinition} Multiple sizes or duplicate lines in one order count once. Repeat-order rate in the detail panel also includes repeat orders within one season. Missing order IDs or dates leave rates unavailable. These are history-wide metrics. Model confidence is a model signal, not measured forecast accuracy.</p>
+            </details>
+          </div>
         </div>
-        {products.length>0&&<div className="rounded-lg border bg-slate-50 p-4 text-sm text-slate-600"><p>History: {products[0].historyStart||'unknown'} to {products[0].historyEnd||'unknown'}{products[0].ordersThrough?` · Joolan orders through ${products[0].ordersThrough}`:''}. Forecast: {products[0].forecastStart||'unknown'} to {products[0].forecastEnd||'unknown'}.</p><p className="mt-2">{products[0].demandDefinition} Model training cutoff: {products[0].trainingCutoff||'unknown'}. KPI history includes recorded orders after that cutoff.</p><details className="mt-2"><summary className="cursor-pointer font-medium">How these KPIs work</summary><p className="mt-2">Diffusion = customers buying this article/colour ÷ all customers in the published source history. Depth = historical booked demand ÷ buying customers. Reorder: {products[0].reorderDefinition} Multiple sizes or duplicate lines in one order count once. Repeat-order rate in the detail panel also includes repeat orders within one season. Missing order IDs or dates leave rates unavailable. These are history-wide metrics. Model confidence is a model signal, not measured forecast accuracy.</p></details></div>}
-        {error&&<div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error}<Button variant="outline" className="ml-3" onClick={()=>void loadProducts()}>Retry</Button></div>}
+      )}
+      {error&&<Notice tone="danger"><div className="flex flex-wrap items-center gap-3">{error}<BrandButton variant="outline" size="sm" onClick={()=>void loadProducts()}>Retry</BrandButton></div></Notice>}
 
+      <section className="overflow-hidden rounded-3xl border border-line bg-card shadow-card">
         {/* Filters */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex flex-wrap gap-4">
-              <div className="relative flex-1 min-w-[200px]">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <Input
-                  placeholder="Search by SKU or name..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  {categories.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="new">New</SelectItem>
-                  <SelectItem value="carry-over">Carry-over</SelectItem>
-                  <SelectItem value="core">Core</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortField)}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="diffusionRate">Diffusion Rate</SelectItem>
-                  <SelectItem value="reorderRate">Reorder Rate</SelectItem>
-                  <SelectItem value="totalUnitsSold">Booked demand</SelectItem>
-                  <SelectItem value="depthPerCustomer">Depth/Customer</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex flex-wrap gap-2.5 border-b border-line px-5 py-[18px]">
+          <div className="relative flex flex-[1_1_260px] items-center">
+            <MagnifyingGlassIcon className="absolute left-3.5 h-4 w-4 text-fg-3" />
+            <TextField
+              aria-label="Search products"
+              placeholder="Search by SKU or name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10"
+            />
+          </div>
+          <SelectField aria-label="Category" className="min-w-[160px]" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+            <option value="all">All Categories</option>
+            {categories.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </SelectField>
+          <SelectField aria-label="Status" className="min-w-[160px]" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+            <option value="all">All Status</option>
+            <option value="new">New</option>
+            <option value="carry-over">Carry-over</option>
+            <option value="core">Core</option>
+          </SelectField>
+          <SelectField aria-label="Sort by" className="min-w-[160px]" value={sortBy} onChange={(e) => setSortBy(e.target.value as SortField)}>
+            <option value="diffusionRate">Diffusion Rate</option>
+            <option value="reorderRate">Reorder Rate</option>
+            <option value="totalUnitsSold">Booked demand</option>
+            <option value="depthPerCustomer">Depth/Customer</option>
+          </SelectField>
+        </div>
 
         {/* Table */}
-        <Card>
-          <CardContent className="p-0">
-            {isLoading ? (
-              <div className="p-6 space-y-3">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-14 bg-slate-100 dark:bg-slate-800 rounded animate-pulse"
-                  />
+        {isLoading ? (
+          <div className="flex flex-col gap-3 p-6">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="h-14 animate-pulse rounded-xl bg-soft" />
+            ))}
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[1180px] text-sm">
+              <thead>
+                <tr className="border-b border-line bg-page">
+                  <th className={cn(TH, "pl-6 text-left")}>SKU</th>
+                  <th className={cn(TH, "text-left")}>Status</th>
+                  <th className={cn(TH, "text-right")}>
+                    <SortableHeader field="diffusionRate" label="Diffusion" />
+                  </th>
+                  <th className={cn(TH, "text-right")}>
+                    <SortableHeader field="depthPerCustomer" label="Depth/Cust" />
+                  </th>
+                  <th className={cn(TH, "text-right")}>
+                    <SortableHeader field="reorderRate" label="Reorder" />
+                  </th>
+                  <th className={cn(TH, "text-right")}>
+                    <SortableHeader field="totalUnitsSold" label="Booked demand" />
+                  </th>
+                  <th className={cn(TH, "text-right")}>Base forecast</th>
+                  <th className={cn(TH, "text-center")}>Customers</th>
+                  <th className={cn(TH, "max-w-[240px] text-left")}>Style name</th>
+                  <th className={cn(TH, "pr-6 text-center")}>Confidence</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line">
+                {filteredProducts.slice(page*50,(page+1)*50).map((product) => (
+                  <tr
+                    key={product.skuId}
+                    className="cursor-pointer transition-colors hover:bg-page focus-visible:bg-page focus-visible:outline-none"
+                    onClick={() => setSelectedProduct(product)}
+                    tabIndex={0}
+                    onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setSelectedProduct(product);}}}
+                  >
+                    <td className="py-[13px] pl-6 pr-3.5">
+                      <div className="flex flex-col gap-0.5">
+                        <p className="font-mono text-[13px] font-bold">{product.skuId.split('|')[0]}</p>
+                        <p className="text-xs text-fg-2">{product.skuId.split('|')[1]}</p>
+                        <p className="text-xs text-fg-3">{product.category}</p>
+                      </div>
+                    </td>
+                    <td className="px-3.5 py-[13px]">
+                      <StatusPill status={product.status} />
+                    </td>
+                    <td className="px-3.5 py-[13px]">
+                      <div className="flex items-center justify-end gap-2.5">
+                        <div className="h-1.5 w-16 overflow-hidden rounded-full bg-soft">
+                          <div className="h-full rounded-full bg-brand" style={{ width: `${Math.min(100, Math.max(0, product.diffusionRate * 100))}%` }} />
+                        </div>
+                        <span className="w-11 text-right font-mono text-[13px] font-bold tabular-nums">
+                          {(product.diffusionRate * 100).toFixed(1)}%
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-3.5 py-[13px] text-right font-mono text-[13px] font-bold tabular-nums">
+                      {product.depthPerCustomer.toFixed(1)}
+                    </td>
+                    <td className="px-3.5 py-[13px] text-right font-mono text-[13px] font-bold tabular-nums">
+                      {rate(product.reorderRate)}
+                    </td>
+                    <td className="px-3.5 py-[13px] text-right font-mono text-[13px] font-bold tabular-nums">
+                      {units(product.historicalDemand)}
+                    </td>
+                    <td className="px-3.5 py-[13px] text-right font-mono text-[13px] font-bold tabular-nums text-plum-600">{units(product.forecastUnits)}</td>
+                    <td className="px-3.5 py-[13px] text-center">
+                      <span className="inline-block min-w-8 rounded-full border border-line px-[9px] py-[3px] text-center font-mono text-xs font-semibold">
+                        {product.buyingCustomers}
+                      </span>
+                    </td>
+                    <td
+                      className="max-w-[280px] px-3.5 py-[13px] text-fg-2"
+                      title={product.name}
+                    >
+                      <p className="line-clamp-2 text-[13px]">{product.name}</p>
+                    </td>
+                    <td className="py-[13px] pl-3.5 pr-6">
+                      <div className="flex justify-center">
+                        <ConfidenceBadge level={product.aiConfidence} />
+                      </div>
+                    </td>
+                  </tr>
                 ))}
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
-                      <th className="px-4 py-3 text-left font-medium text-slate-500">SKU</th>
-                      <th className="px-4 py-3 text-left font-medium text-slate-500">Status</th>
-                      <th className="px-4 py-3 text-right">
-                        <SortableHeader field="diffusionRate" label="Diffusion" />
-                      </th>
-                      <th className="px-4 py-3 text-right">
-                        <SortableHeader field="depthPerCustomer" label="Depth/Cust" />
-                      </th>
-                      <th className="px-4 py-3 text-right">
-                        <SortableHeader field="reorderRate" label="Reorder" />
-                      </th>
-                      <th className="px-4 py-3 text-right">
-                        <SortableHeader field="totalUnitsSold" label="Booked demand" />
-                      </th>
-                      <th className="px-4 py-3 text-right font-medium text-slate-500">Base forecast</th>
-                      <th className="px-4 py-3 text-center font-medium text-slate-500">
-                        Customers
-                      </th>
-                      <th className="px-4 py-3 text-left font-medium text-slate-500 max-w-[240px]">
-                        Style name
-                      </th>
-                      <th className="px-4 py-3 text-center font-medium text-slate-500">
-                        Confidence
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                    {filteredProducts.slice(page*50,(page+1)*50).map((product) => (
-                      <tr
-                        key={product.skuId}
-                        className="hover:bg-slate-50 dark:hover:bg-slate-900/50 cursor-pointer transition-colors"
-                        onClick={() => setSelectedProduct(product)}
-                        tabIndex={0}
-                        onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setSelectedProduct(product);}}}
-                      >
-                        <td className="px-4 py-3">
-                          <div>
-                            <p className="font-medium">{product.skuId.split('|')[0]}</p>
-                            <p className="text-xs text-slate-500">{product.skuId.split('|')[1]}</p>
-                            <p className="text-xs text-slate-500">{product.category}</p>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <Badge className={cn("text-xs", statusColors[product.status])}>
-                            {product.status}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center justify-end gap-2">
-                            <Progress
-                              value={product.diffusionRate * 100}
-                              className="w-16 h-2"
-                            />
-                            <span className="text-xs font-medium w-10 text-right">
-                              {(product.diffusionRate * 100).toFixed(1)}%
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-right font-medium">
-                          {product.depthPerCustomer.toFixed(1)}
-                        </td>
-                        <td className="px-4 py-3 text-right font-medium">
-                          {rate(product.reorderRate)}
-                        </td>
-                        <td className="px-4 py-3 text-right font-medium">
-                          {units(product.historicalDemand)}
-                        </td>
-                        <td className="px-4 py-3 text-right font-medium">{units(product.forecastUnits)}</td>
-                        <td className="px-4 py-3 text-center">
-                          <Badge variant="outline" className="text-xs">
-                            {product.buyingCustomers}
-                          </Badge>
-                        </td>
-                        <td
-                          className="px-4 py-3 text-slate-700 dark:text-slate-300 max-w-[280px]"
-                          title={product.name}
-                        >
-                          <p className="text-sm line-clamp-2">{product.name}</p>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex justify-center">
-                            <ConfidenceBadge level={product.aiConfidence} size="sm" />
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                    {!filteredProducts.length&&<tr><td colSpan={10} className="p-8 text-center text-slate-500">{error?'Product KPIs could not be loaded. Retry above.':products.length?'No articles match your filters.':'No published product KPIs are available. Run a forecast in Setup.'}</td></tr>}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        {!isLoading&&!error&&<div className="flex items-center justify-between text-sm"><p>{filteredProducts.length} article/colour combinations · Page {page+1} of {Math.max(1,Math.ceil(filteredProducts.length/50))}</p><div className="flex gap-2"><Button variant="outline" disabled={!page} onClick={()=>setPage(p=>p-1)}>Previous</Button><Button variant="outline" disabled={(page+1)*50>=filteredProducts.length} onClick={()=>setPage(p=>p+1)}>Next</Button></div></div>}
-      </div>
+                {!filteredProducts.length&&<tr><td colSpan={10} className="p-10 text-center text-sm text-fg-3">{error?'Product KPIs could not be loaded. Retry above.':products.length?'No articles match your filters.':'No published product KPIs are available. Run a forecast in Setup.'}</td></tr>}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+      {!isLoading&&!error&&(
+        <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
+          <p className="text-fg-2"><strong className="text-fg-1">{filteredProducts.length}</strong> article/colour combinations · Page {page+1} of {Math.max(1,Math.ceil(filteredProducts.length/50))}</p>
+          <div className="flex gap-2">
+            <BrandButton variant="outline" disabled={!page} onClick={()=>setPage(p=>p-1)}>Previous</BrandButton>
+            <BrandButton variant="outline" disabled={(page+1)*50>=filteredProducts.length} onClick={()=>setPage(p=>p+1)}>Next</BrandButton>
+          </div>
+        </div>
+      )}
 
       {/* Product Detail Sheet */}
       <Sheet open={!!selectedProduct} onOpenChange={() => setSelectedProduct(null)}>
-        <SheetContent className="sm:max-w-lg overflow-y-auto">
+        <SheetContent className="w-full gap-0 overflow-y-auto border-line bg-card p-0 sm:max-w-[540px]">
           {selectedProduct && (
             <>
-              <SheetHeader>
-                <SheetTitle>{selectedProduct.skuId}</SheetTitle>
-                <SheetDescription>
+              <SheetHeader className="sticky top-0 z-[1] gap-1.5 space-y-0 border-b border-line bg-card px-7 py-6 pr-14 text-left">
+                <SheetTitle className="break-all font-mono text-lg font-bold">{selectedProduct.skuId}</SheetTitle>
+                <SheetDescription className="text-sm text-fg-3">
                   {selectedProduct.name} • {selectedProduct.category}
                 </SheetDescription>
               </SheetHeader>
-              <div className="mt-6 space-y-6">
+              <div className="flex flex-col gap-5 px-7 pb-8 pt-6">
                 <div className="flex items-center gap-2">
-                  <Badge className={statusColors[selectedProduct.status]}>
-                    {selectedProduct.status}
-                  </Badge>
+                  <StatusPill status={selectedProduct.status} className="px-3 py-1" />
                   <ConfidenceBadge level={selectedProduct.aiConfidence} />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900">
-                    <p className="text-sm text-slate-500">Diffusion Rate</p>
-                    <p className="text-2xl font-bold">
-                      {(selectedProduct.diffusionRate * 100).toFixed(1)}%
-                    </p>
-                  </div>
-                  <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900">
-                    <p className="text-sm text-slate-500">Depth/Customer</p>
-                    <p className="text-2xl font-bold">
-                      {selectedProduct.depthPerCustomer.toFixed(1)}
-                    </p>
-                  </div>
-                  <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900">
-                    <p className="text-sm text-slate-500">Reorder Rate</p>
-                    <p className="text-2xl font-bold">
-                      {rate(selectedProduct.reorderRate)}
-                    </p>
-                  </div>
-                  <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900">
-                    <p className="text-sm text-slate-500">Historical booked demand</p>
-                    <p className="text-2xl font-bold">
-                      {units(selectedProduct.historicalDemand)}
-                    </p>
-                  </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <MetricTile label="Diffusion Rate" value={`${(selectedProduct.diffusionRate * 100).toFixed(1)}%`} />
+                  <MetricTile label="Depth/Customer" value={selectedProduct.depthPerCustomer.toFixed(1)} />
+                  <MetricTile label="Reorder Rate" value={rate(selectedProduct.reorderRate)} />
+                  <MetricTile label="Historical booked demand" value={units(selectedProduct.historicalDemand)} />
                 </div>
 
-                <div className="rounded-lg border p-4 text-sm"><p className="font-medium">Repeat buying from dated orders</p><p className="mt-2">Across seasons: {selectedProduct.reorderCustomers} of {selectedProduct.reorderBuyingCustomers} buyers · {rate(selectedProduct.reorderRate)}</p><p className="mt-1">Two or more distinct orders, including within one season: {selectedProduct.repeatOrderCustomers} buyers · {rate(selectedProduct.repeatOrderRate)}</p><p className="mt-2 text-xs text-slate-500">April–September / October–March. Each article/colour on an order is counted once across all sizes.</p>{selectedProduct.reorderMissingLines>0&&<p className="mt-2 text-xs text-amber-800">{selectedProduct.reorderMissingLines} positive-demand lines have missing or inconsistent order IDs or dates. Rates remain unavailable.</p>}</div>
+                <section className="rounded-[18px] border border-line px-5 py-[18px] text-sm leading-relaxed"><p className="font-bold">Repeat buying from dated orders</p><p className="mt-2">Across seasons: {selectedProduct.reorderCustomers} of {selectedProduct.reorderBuyingCustomers} buyers · {rate(selectedProduct.reorderRate)}</p><p className="mt-1">Two or more distinct orders, including within one season: {selectedProduct.repeatOrderCustomers} buyers · {rate(selectedProduct.repeatOrderRate)}</p><p className="mt-2 text-xs text-fg-3">April–September / October–March. Each article/colour on an order is counted once across all sizes.</p>{selectedProduct.reorderMissingLines>0&&<p className="mt-2 text-xs text-brand-800">{selectedProduct.reorderMissingLines} positive-demand lines have missing or inconsistent order IDs or dates. Rates remain unavailable.</p>}</section>
 
                 <RecentSizeHistory product={selectedProduct}/>
 
-                <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900">
-                  <p className="text-sm text-slate-500">Buying Customers</p>
-                  <p className="text-2xl font-bold">{selectedProduct.buyingCustomers}</p>
-                </div>
+                <MetricTile label="Buying Customers" value={selectedProduct.buyingCustomers} />
 
-                <Button asChild className="w-full">
+                <BrandButton asChild size="lg" className="w-full">
                   <Link href={`/recommendations?sku=${encodeURIComponent(selectedProduct.skuId)}`}>
                     View Recommendation
-                    <ArrowRight className="h-4 w-4 ml-2" />
+                    <ArrowRightIcon />
                   </Link>
-                </Button>
+                </BrandButton>
               </div>
             </>
           )}

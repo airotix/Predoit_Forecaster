@@ -18,18 +18,24 @@ def install(app,connection):
 
     @app.middleware('http')
     async def access_control(request,call_next):
+        import access_settings as access
+        from auth_routes import authorize
         origin=request.headers.get('origin')
         token=os.environ.get('FORECASTER_API_TOKEN','')
         client=request.client.host if request.client else ''
         host=request.url.hostname
         allowed={'localhost','127.0.0.1','::1','testserver'}
-        if origin and origin not in ('http://localhost:3000','http://127.0.0.1:3000'):
+        if origin and origin.rstrip('/') not in access.CORS_ORIGINS:
             return JSONResponse({'detail':'This origin is not allowed.'},403)
         if request.method!='OPTIONS':
-            if token:
+            verdict=authorize(request)
+            if verdict is not None:
+                # Authentication is active: bearer tokens and roles replace the local-only rule.
+                if verdict is not True:return verdict
+            elif token:
                 supplied=request.headers.get('authorization','')
                 if not secrets.compare_digest(supplied,'Bearer '+token):return JSONResponse({'detail':'Authentication required.'},401)
-            elif client not in allowed|{'testclient'} or host not in allowed:
+            elif (client not in allowed|{'testclient'} and not access.ALLOW_NON_LOCAL) or host not in allowed:
                 return JSONResponse({'detail':'Local access only. Configure FORECASTER_API_TOKEN for shared access.'},403)
         return await call_next(request)
 

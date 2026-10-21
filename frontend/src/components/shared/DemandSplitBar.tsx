@@ -47,39 +47,34 @@ export default function DemandSplitBar({
       label: "Recorded orders included",
       value: confirmed,
       percent: confirmedPercent,
-      color: "bg-emerald-500 dark:bg-emerald-600",
+      color: "bg-success-400",
     },
     {
       label: "Projected quantity",
       value: probableReorders,
       percent: reordersPercent,
-      color: "bg-blue-500 dark:bg-blue-600",
+      color: "bg-brand",
     },
     {
       label: "Other projection",
       value: nonVisitedProjection,
       percent: projectedPercent,
-      color: "bg-slate-400 dark:bg-slate-500",
+      color: "bg-fg-4",
     },
   ];
 
   const Bar = (
     <div
       className={cn(
-        "flex w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800",
+        "flex w-full overflow-hidden rounded-full bg-soft",
         heightClasses[height],
         className
       )}
     >
-      {segments.map((segment, idx) => (
+      {segments.map((segment) => (
         <div
           key={segment.label}
-          className={cn(
-            segment.color,
-            "transition-all duration-300",
-            idx === 0 && "rounded-l-full",
-            idx === segments.length - 1 && "rounded-r-full"
-          )}
+          className={cn(segment.color, "transition-all duration-300")}
           style={{ width: `${segment.percent}%` }}
         />
       ))}
@@ -87,7 +82,7 @@ export default function DemandSplitBar({
   );
 
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-2.5">
       {showTooltips ? (
         <TooltipProvider>
           <Tooltip>
@@ -97,7 +92,7 @@ export default function DemandSplitBar({
                 {segments.map((segment) => (
                   <div key={segment.label} className="flex items-center gap-2">
                     <div className={cn("h-2.5 w-2.5 rounded-sm", segment.color)} />
-                    <span className="text-slate-600 dark:text-slate-400">
+                    <span className="text-fg-2">
                       {segment.label}:
                     </span>
                     <span className="font-semibold">
@@ -105,7 +100,7 @@ export default function DemandSplitBar({
                     </span>
                   </div>
                 ))}
-                <div className="border-t border-slate-200 dark:border-slate-700 pt-1.5 mt-1.5">
+                <div className="mt-1.5 border-t border-line pt-1.5">
                   <span className="font-semibold">Total: {total.toLocaleString()}</span>
                 </div>
               </div>
@@ -117,7 +112,7 @@ export default function DemandSplitBar({
       )}
 
       {showLabels && (
-        <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-fg-2">
           {segments.map((segment) => (
             <div key={segment.label} className="flex items-center gap-1.5">
               <div className={cn("h-2 w-2 rounded-sm", segment.color)} />

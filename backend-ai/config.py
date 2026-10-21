@@ -4,7 +4,8 @@
 import os
 
 # Automatically find the script directory
-_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+import paths
+_BASE_DIR = str(paths.HOME)
 
 # Your data file — UPDATE THIS NAME to match your actual file
 DATA_FILE_NAME = "THE_FINAL_10Y_cleaned.csv"  # ← change this to your actual filename

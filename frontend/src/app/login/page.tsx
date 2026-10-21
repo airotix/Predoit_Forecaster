@@ -3,23 +3,23 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  AlertCircle,
-  ArrowRight,
-  BarChart3,
-  CheckCircle2,
-  Eye,
-  EyeOff,
-  Loader2,
-  Lock,
-  Mail,
-  ShieldCheck,
-  Sparkles,
-  User,
-} from 'lucide-react';
+  ArrowRightIcon,
+  CheckCircleIcon,
+  CircleNotchIcon,
+  EnvelopeSimpleIcon,
+  EyeIcon,
+  EyeSlashIcon,
+  LockSimpleIcon,
+  ShieldCheckIcon,
+  SparkleIcon,
+  UserIcon,
+} from '@phosphor-icons/react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { fetchAuthConfig, type AuthConfig } from '@/lib/api/auth';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { BrandMark } from '@/components/layout/Sidebar';
+import { ModeToggle } from '@/components/mode-toggle';
+import { BrandButton } from '@/components/ui/brand-button';
+import { Notice, TextField } from '@/components/ui/brand';
 import { cn } from '@/lib/utils';
 
 type Mode = 'signin' | 'signup';
@@ -95,273 +95,289 @@ export default function LoginPage() {
   const signupAllowed = config?.signupAllowed ?? true;
 
   return (
-    <div className="min-h-screen w-full lg:grid lg:grid-cols-[1.1fr_1fr] bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen w-full bg-page text-fg-1 lg:grid lg:grid-cols-[1.05fr_1fr] lg:gap-4 lg:p-4">
       {/* ── Brand / hero panel ── */}
-      <div className="relative hidden overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-700 to-slate-900 lg:flex lg:flex-col lg:justify-between p-12 text-white">
+      <div className="relative hidden overflow-hidden rounded-[32px] bg-champagne p-12 lg:flex lg:flex-col lg:justify-between">
         <div
-          className="pointer-events-none absolute inset-0 opacity-20"
-          style={{
-            backgroundImage:
-              'radial-gradient(circle at 20% 20%, white 1px, transparent 1px), radial-gradient(circle at 80% 60%, white 1px, transparent 1px)',
-            backgroundSize: '48px 48px, 64px 64px',
-          }}
+          aria-hidden
+          className="pointer-events-none absolute -right-32 -top-32 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,var(--glow),rgba(245,130,32,0)_70%)]"
         />
         <div className="relative flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 backdrop-blur">
-            <BarChart3 className="h-6 w-6" />
-          </div>
-          <span className="text-2xl font-semibold tracking-tight">Preduit</span>
+          <BrandMark />
+          <span className="flex flex-col gap-px">
+            <span className="font-display text-xl font-bold tracking-[-0.02em]">Preduit</span>
+            <span className="text-xs text-fg-3">Demand planning</span>
+          </span>
         </div>
 
-        <div className="relative space-y-6">
-          <h1 className="text-4xl font-bold leading-tight tracking-tight">
+        <div className="relative flex max-w-[520px] flex-col gap-6">
+          <h1 className="font-display text-[44px] font-extrabold leading-[1.06] tracking-[-0.02em]">
             Forecast demand.
             <br />
             Order with confidence.
           </h1>
-          <p className="max-w-md text-blue-100/90">
+          <p className="max-w-md text-pretty text-base leading-relaxed text-fg-2">
             AI-driven demand forecasting and net-to-order planning for wholesale — from
             ten years of history to next season&apos;s buy.
           </p>
-          <ul className="space-y-3 pt-2 text-sm text-blue-50">
+          <ul className="flex flex-col gap-2.5 pt-2">
             {[
               'SARIMA + CatBoost forecasts across three scenarios',
               'Size-level recommendations with net-to-order logic',
               'Review, override, and lock every buy',
             ].map((feature) => (
-              <li key={feature} className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 shrink-0 text-blue-200" />
+              <li
+                key={feature}
+                className="flex items-center gap-3 text-[15px] font-semibold text-fg-1"
+              >
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-card text-success-600 shadow-card">
+                  <CheckCircleIcon weight="fill" className="h-[18px] w-[18px]" />
+                </span>
                 <span>{feature}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="relative text-xs text-blue-200/70">
+        <div className="relative text-xs text-fg-3">
           © {new Date().getFullYear()} Preduit · Secure access
         </div>
       </div>
 
       {/* ── Form panel ── */}
-      <div className="flex min-h-screen items-center justify-center p-6 lg:min-h-0">
-        <div className="w-full max-w-md">
+      <div className="relative flex min-h-screen flex-col px-4 py-6 sm:px-6 lg:min-h-0 lg:py-4">
+        <div className="flex items-center justify-between gap-3">
           {/* Mobile brand */}
-          <div className="mb-8 flex items-center gap-3 lg:hidden">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white">
-              <BarChart3 className="h-5 w-5" />
-            </div>
-            <span className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
-              Preduit
+          <div className="flex items-center gap-3 lg:invisible">
+            <BrandMark />
+            <span className="flex flex-col gap-px">
+              <span className="font-display text-xl font-bold tracking-[-0.02em]">Preduit</span>
+              <span className="text-xs text-fg-3">Demand planning</span>
             </span>
           </div>
+          <ModeToggle />
+        </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-            <div className="mb-6">
-              <h2 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
-                {mode === 'signin' ? 'Welcome back' : 'Create your account'}
-              </h2>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                {mode === 'signin'
-                  ? 'Sign in to access your forecasting workspace.'
-                  : 'Set up an account to get started with Preduit.'}
-              </p>
-            </div>
-
-            {/* Tab switcher */}
-            {signupAllowed && (
-              <div className="mb-6 grid grid-cols-2 gap-1 rounded-lg bg-slate-100 p-1 dark:bg-slate-800">
-                {(['signin', 'signup'] as Mode[]).map((m) => (
-                  <button
-                    key={m}
-                    type="button"
-                    onClick={() => switchMode(m)}
-                    className={cn(
-                      'rounded-md py-2 text-sm font-medium transition-all',
-                      mode === m
-                        ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-950 dark:text-white'
-                        : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-                    )}
-                  >
-                    {m === 'signin' ? 'Sign in' : 'Create account'}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Dev-mode banner */}
-            {devMode && (
-              <div className="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm dark:border-amber-800/60 dark:bg-amber-950/40">
-                <div className="flex items-center gap-2 font-medium text-amber-800 dark:text-amber-300">
-                  <ShieldCheck className="h-4 w-4" />
-                  Developer mode
-                </div>
-                <p className="mt-1 text-amber-700/90 dark:text-amber-200/80">
-                  Authentication is disabled — you can enter as{' '}
-                  <span className="font-semibold">{config?.devRole}</span> without signing in.
+        <div className="flex flex-1 items-center justify-center py-8">
+          <div className="w-full max-w-[440px]">
+            <div className="rounded-[32px] border border-line bg-card p-6 shadow-card sm:p-8">
+              <div className="mb-6 flex flex-col gap-1.5">
+                <span className="text-xs font-bold uppercase tracking-[0.12em] text-brand">
+                  Preduit
+                </span>
+                <h2 className="font-display text-[28px] font-extrabold leading-[1.1] tracking-[-0.02em] sm:text-[32px]">
+                  {mode === 'signin' ? 'Welcome back' : 'Create your account'}
+                </h2>
+                <p className="text-sm leading-relaxed text-fg-2">
+                  {mode === 'signin'
+                    ? 'Sign in to access your forecasting workspace.'
+                    : 'Set up an account to get started with Preduit.'}
                 </p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="mt-3 w-full border-amber-300 bg-white/60 text-amber-900 hover:bg-white dark:border-amber-700 dark:bg-transparent dark:text-amber-200"
-                  onClick={() => router.replace('/dashboard')}
-                >
-                  Continue to dashboard
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
               </div>
-            )}
 
-            {/* Error alert */}
-            {error && (
-              <div className="mb-4 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300">
-                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-                <span>{error}</span>
-              </div>
-            )}
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {mode === 'signup' && (
-                <Field label="Full name" htmlFor="name" icon={<User className="h-4 w-4" />}>
-                  <Input
-                    id="name"
-                    type="text"
-                    autoComplete="name"
-                    placeholder="Jane Doe"
-                    className="pl-9"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                </Field>
+              {/* Tab switcher */}
+              {signupAllowed && (
+                <div className="mb-6 grid grid-cols-2 gap-1 rounded-full bg-soft p-1">
+                  {(['signin', 'signup'] as Mode[]).map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => switchMode(m)}
+                      aria-pressed={mode === m}
+                      className={cn(
+                        'h-10 rounded-full text-sm transition-all focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(245,130,32,0.35)]',
+                        mode === m
+                          ? 'bg-card font-bold text-fg-1 shadow-card'
+                          : 'font-semibold text-fg-2 hover:text-fg-1'
+                      )}
+                    >
+                      {m === 'signin' ? 'Sign in' : 'Create account'}
+                    </button>
+                  ))}
+                </div>
               )}
 
-              <Field label="Email" htmlFor="email" icon={<Mail className="h-4 w-4" />}>
-                <Input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="you@company.com"
-                  className="pl-9"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </Field>
+              {/* Dev-mode banner */}
+              {devMode && (
+                <div className="mb-6 flex flex-col gap-3 rounded-[20px] border border-brand-200 bg-brand-50 p-[18px] text-sm">
+                  <div className="flex items-center gap-2 font-bold text-brand-800">
+                    <ShieldCheckIcon weight="fill" className="h-[18px] w-[18px]" />
+                    Developer mode
+                  </div>
+                  <p className="leading-relaxed text-fg-2">
+                    Authentication is disabled — you can enter as{' '}
+                    <span className="font-semibold text-fg-1">{config?.devRole}</span> without signing in.
+                  </p>
+                  <BrandButton
+                    variant="outline"
+                    className="w-full bg-card"
+                    onClick={() => router.replace('/dashboard')}
+                  >
+                    Continue to dashboard
+                    <ArrowRightIcon />
+                  </BrandButton>
+                </div>
+              )}
 
-              <Field label="Password" htmlFor="password" icon={<Lock className="h-4 w-4" />}>
-                <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
-                  placeholder={mode === 'signup' ? 'At least 8 characters' : '••••••••'}
-                  className="pl-9 pr-10"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((s) => !s)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-200"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  tabIndex={-1}
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </Field>
+              {/* Error alert */}
+              {error && (
+                <Notice tone="danger" className="mb-4">
+                  {error}
+                </Notice>
+              )}
 
-              {mode === 'signup' && (
-                <Field
-                  label="Confirm password"
-                  htmlFor="confirm"
-                  icon={<Lock className="h-4 w-4" />}
-                >
-                  <Input
-                    id="confirm"
-                    type={showPassword ? 'text' : 'password'}
-                    autoComplete="new-password"
-                    placeholder="Re-enter your password"
-                    className="pl-9"
-                    value={confirm}
-                    onChange={(e) => setConfirm(e.target.value)}
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                {mode === 'signup' && (
+                  <Field label="Full name" htmlFor="name" icon={<UserIcon className="h-[18px] w-[18px]" />}>
+                    <TextField
+                      id="name"
+                      type="text"
+                      autoComplete="name"
+                      placeholder="Jane Doe"
+                      className="h-[52px] w-full rounded-[14px] pl-11 text-[15px]"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </Field>
+                )}
+
+                <Field label="Email" htmlFor="email" icon={<EnvelopeSimpleIcon className="h-[18px] w-[18px]" />}>
+                  <TextField
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="you@company.com"
+                    className="h-[52px] w-full rounded-[14px] pl-11 text-[15px]"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </Field>
+
+                <Field label="Password" htmlFor="password" icon={<LockSimpleIcon className="h-[18px] w-[18px]" />}>
+                  <TextField
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
+                    placeholder={mode === 'signup' ? 'At least 8 characters' : '••••••••'}
+                    className="h-[52px] w-full rounded-[14px] pl-11 pr-12 text-[15px]"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((s) => !s)}
+                    className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-[10px] text-fg-3 transition-colors hover:bg-soft hover:text-fg-1"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      <EyeSlashIcon className="h-[18px] w-[18px]" />
+                    ) : (
+                      <EyeIcon className="h-[18px] w-[18px]" />
+                    )}
+                  </button>
+                </Field>
+
+                {mode === 'signup' && (
+                  <Field
+                    label="Confirm password"
+                    htmlFor="confirm"
+                    icon={<LockSimpleIcon className="h-[18px] w-[18px]" />}
+                  >
+                    <TextField
+                      id="confirm"
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      placeholder="Re-enter your password"
+                      className="h-[52px] w-full rounded-[14px] pl-11 text-[15px]"
+                      value={confirm}
+                      onChange={(e) => setConfirm(e.target.value)}
+                      required
+                    />
+                  </Field>
+                )}
+
+                <BrandButton type="submit" size="lg" className="mt-1 w-full" disabled={submitting}>
+                  {submitting ? (
+                    <>
+                      <CircleNotchIcon className="animate-spin" />
+                      {mode === 'signin' ? 'Signing in…' : 'Creating account…'}
+                    </>
+                  ) : (
+                    <>
+                      {mode === 'signin' ? 'Sign in' : 'Create account'}
+                      <ArrowRightIcon />
+                    </>
+                  )}
+                </BrandButton>
+              </form>
+
+              {/* SSO */}
+              {ssoEnabled && (
+                <>
+                  <div className="my-6 flex items-center gap-3">
+                    <div className="h-px flex-1 bg-line" />
+                    <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-fg-3">
+                      or
+                    </span>
+                    <div className="h-px flex-1 bg-line" />
+                  </div>
+                  <BrandButton
+                    variant="outline"
+                    size="lg"
+                    className="w-full"
+                    onClick={() => login()}
+                    disabled={submitting}
+                  >
+                    <MicrosoftLogo />
+                    Sign in with Microsoft
+                  </BrandButton>
+                </>
               )}
 
-              <Button type="submit" className="w-full" disabled={submitting}>
-                {submitting ? (
+              {mode === 'signup' && (
+                <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-xs leading-relaxed text-fg-3">
+                  <SparkleIcon weight="fill" className="h-3.5 w-3.5 shrink-0 text-brand" />
+                  New accounts start with view-only access. An admin can upgrade your role.
+                </p>
+              )}
+            </div>
+
+            <p className="mt-6 text-center text-sm text-fg-2">
+              {mode === 'signin' ? (
+                signupAllowed ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    {mode === 'signin' ? 'Signing in…' : 'Creating account…'}
+                    Don&apos;t have an account?{' '}
+                    <button
+                      onClick={() => switchMode('signup')}
+                      className="font-bold text-brand-700 hover:text-brand-800 hover:underline"
+                    >
+                      Create one
+                    </button>
                   </>
                 ) : (
-                  <>
-                    {mode === 'signin' ? 'Sign in' : 'Create account'}
-                    <ArrowRight className="h-4 w-4" />
-                  </>
-                )}
-              </Button>
-            </form>
-
-            {/* SSO */}
-            {ssoEnabled && (
-              <>
-                <div className="my-6 flex items-center gap-3">
-                  <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
-                  <span className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                    or
-                  </span>
-                  <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => login()}
-                  disabled={submitting}
-                >
-                  <MicrosoftLogo />
-                  Sign in with Microsoft
-                </Button>
-              </>
-            )}
-
-            {mode === 'signup' && (
-              <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-xs text-slate-400">
-                <Sparkles className="h-3.5 w-3.5" />
-                New accounts start with view-only access. An admin can upgrade your role.
-              </p>
-            )}
-          </div>
-
-          <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
-            {mode === 'signin' ? (
-              signupAllowed ? (
+                  'Contact your administrator for access.'
+                )
+              ) : (
                 <>
-                  Don&apos;t have an account?{' '}
+                  Already have an account?{' '}
                   <button
-                    onClick={() => switchMode('signup')}
-                    className="font-medium text-blue-600 hover:underline dark:text-blue-400"
+                    onClick={() => switchMode('signin')}
+                    className="font-bold text-brand-700 hover:text-brand-800 hover:underline"
                   >
-                    Create one
+                    Sign in
                   </button>
                 </>
-              ) : (
-                'Contact your administrator for access.'
-              )
-            ) : (
-              <>
-                Already have an account?{' '}
-                <button
-                  onClick={() => switchMode('signin')}
-                  className="font-medium text-blue-600 hover:underline dark:text-blue-400"
-                >
-                  Sign in
-                </button>
-              </>
-            )}
-          </p>
+              )}
+            </p>
+
+            <p className="mt-3 text-center text-xs text-fg-3 lg:hidden">
+              © {new Date().getFullYear()} Preduit · Secure access
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -380,15 +396,12 @@ function Field({
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-1.5">
-      <label
-        htmlFor={htmlFor}
-        className="text-sm font-medium text-slate-700 dark:text-slate-300"
-      >
+    <div className="flex flex-col gap-2">
+      <label htmlFor={htmlFor} className="text-sm font-bold text-fg-1">
         {label}
       </label>
       <div className="relative">
-        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+        <span className="pointer-events-none absolute left-4 top-1/2 z-[1] -translate-y-1/2 text-fg-3">
           {icon}
         </span>
         {children}

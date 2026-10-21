@@ -4,6 +4,8 @@ const nextConfig = {
   output: 'standalone',
   // A production build must not replace CSS/chunks served by a running dev server.
   distDir: process.env.NODE_ENV === 'development' ? '.next-dev' : '.next',
+  // Import only the icons a page uses from the Phosphor barrel file.
+  experimental: { optimizePackageImports: ['@phosphor-icons/react'] },
 };
 
 export default nextConfig;

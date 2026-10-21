@@ -6,6 +6,7 @@ import datetime as dt
 import json
 import os
 from pathlib import Path
+import paths
 import sqlite3
 import tempfile
 import zlib
@@ -13,7 +14,7 @@ import zlib
 import pandas as pd
 from m1_data_preparation import EXPECTED_COLUMNS, _standardize_columns, parse_order_dates
 
-DEFAULT_PATH = Path(__file__).resolve().parent / 'data' / 'history.db'
+DEFAULT_PATH = paths.HISTORY_DB
 
 
 def connection(path=None):

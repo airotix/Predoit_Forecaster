@@ -248,7 +248,7 @@ class FreshTests(unittest.TestCase):
     def test_fresh_pipeline_trains_closed_months_and_publishes_lineage(self):
         import main
         rid,run=self.export();fresh.activate(rid,self.c,self.path)
-        with patch.object(fresh,'SOURCE_DB',self.path),patch.object(database,'DB_FILE',self.serving_path),patch.object(database,'get_connection',lambda:sqlite3.connect(self.serving_path)),patch.object(main,'__file__',str(self.base/'main.py')),patch.dict(os.environ,{'FORECASTER_DISABLE_CATBOOST':'1'}):
+        with patch.object(fresh,'SOURCE_DB',self.path),patch.object(database,'DB_FILE',self.serving_path),patch.object(database,'get_connection',lambda:sqlite3.connect(self.serving_path)),patch.object(main,'BASE_DIR',self.base),patch.dict(os.environ,{'FORECASTER_DISABLE_CATBOOST':'1'}):
             result=main.run_phase1()
         self.assertEqual(result['lineage']['source'],'fresh')
         self.assertEqual(result['lineage']['freshRun'],rid)

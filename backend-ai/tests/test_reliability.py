@@ -79,7 +79,7 @@ class PublicationTests(unittest.TestCase):
                 row.update(Client='C',Reference='P',Couleur='B',Taille='M',Reference_CDE='O'+str(i),Date_Commande=str(month)+'-01',Critere='Hiver('+str(month.year)+')',CDE_qte=5,LIV_qte=5,RELIQUAT_qte=0,STOCK=2,CDE_four_qte=1,Prix=10,Selling_Price=10,Purchase_Cost=4,Famille='F',Rayon='R',Saison='S',Nom='Customer')
                 rows.append(row)
             pd.DataFrame(rows).to_csv(csv_path,index=False)
-            with patch.object(database,'DB_FILE',path),patch.object(database,'get_connection',lambda:sqlite3.connect(path)),patch.object(main,'__file__',str(base/'main.py')),patch.dict(os.environ,{'FORECASTER_DISABLE_CATBOOST':'1'}):
+            with patch.object(database,'DB_FILE',path),patch.object(database,'get_connection',lambda:sqlite3.connect(path)),patch.object(main,'BASE_DIR',base),patch.dict(os.environ,{'FORECASTER_DISABLE_CATBOOST':'1'}):
                 results=main._run_phase1(str(csv_path))
             conn=sqlite3.connect(path)
             self.assertEqual(conn.execute('SELECT COUNT(*) FROM forecast_monthly').fetchone()[0],6)

@@ -139,7 +139,7 @@ class HistoryTests(unittest.TestCase):
         with patch('config.DATA_FILE_PATH',str(self.csv)),patch.object(history_store,'DEFAULT_PATH',self.path):
             joolan.select_forecast_source(source,'combined')
             source.close()
-            with patch.object(database,'DB_FILE',serving),patch.object(database,'get_connection',lambda:sqlite3.connect(serving)),patch.object(main,'__file__',str(self.base/'main.py')),patch.dict(os.environ,{'FORECASTER_DISABLE_CATBOOST':'1'}):
+            with patch.object(database,'DB_FILE',serving),patch.object(database,'get_connection',lambda:sqlite3.connect(serving)),patch.object(main,'BASE_DIR',self.base),patch.dict(os.environ,{'FORECASTER_DISABLE_CATBOOST':'1'}):
                 results=main._run_phase1()
         self.assertEqual(results['lineage']['source'],'combined')
         self.assertEqual(results['lineage']['cutoff'],'2024-01')

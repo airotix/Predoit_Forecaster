@@ -1,12 +1,13 @@
 "use client";
 import {useCallback,useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
-import {ChevronDown,Save,SlidersHorizontal} from 'lucide-react';
+import {ArrowRightIcon,ArrowsClockwiseIcon,CaretDownIcon,CheckCircleIcon,CircleIcon,DropIcon,FloppyDiskIcon,MagnifyingGlassIcon,SlidersHorizontalIcon,WarningIcon} from '@phosphor-icons/react';
 import AppShell from '@/components/layout/AppShell';
-import {Button} from '@/components/ui/button';
-import {Input} from '@/components/ui/input';
+import {BrandButton} from '@/components/ui/brand-button';
+import {Notice,PageHeader,TextField} from '@/components/ui/brand';
 import {ScenarioSwitcher} from '@/components/shared';
 import {apiClient} from '@/lib/api/client';
+import {cn} from '@/lib/utils';
 import {useSeasonStore} from '@/store/seasonStore';
 import {useDataRefresh} from '@/hooks/useDataRefresh';
 
@@ -18,10 +19,44 @@ const currentCodes=['H26','FW27','P27','CORE','RECONDUIT'];
 const qty=(value:number|null)=>value==null?'—':value.toLocaleString(undefined,{maximumFractionDigits:2});
 const sizeOrder=['XXS','XS','S','M','L','XL','XXL','XL2','XXXL','XL3','XL4','XL5','XL6','XL7'];
 const sizeCompare=(a:Variant,b:Variant)=>{const ai=sizeOrder.indexOf(a.size),bi=sizeOrder.indexOf(b.size);return ai>=0&&bi>=0?ai-bi:a.size.localeCompare(b.size,undefined,{numeric:true});};
+const SIZE_GRID='grid grid-cols-[44px_minmax(0,1fr)_76px_92px_112px] items-center gap-2';
+const MONTH_INPUT='h-12 w-full rounded-[14px] text-[15px] font-semibold';
 
 function ArticleAllocation({article}:{article:Article}){
  const colors=Array.from(new Set(article.rows.map(r=>r.color))).sort();
- return <details className="group overflow-hidden rounded-xl border bg-white dark:bg-slate-950"><summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-4 p-5"><div><p className="text-xs text-slate-500">{article.brand} <span className="ml-2 rounded bg-slate-100 px-2 py-1 text-slate-600 dark:bg-slate-800">{article.code}</span></p><h3 className="mt-2 font-semibold">{article.reference} <span className="ml-2 font-normal">{article.name}</span></h3><p className="mt-1 text-xs text-slate-500">{colors.length} colours · {article.rows.length} size variants</p></div><div className="flex items-center gap-5"><div className="text-right"><p className="text-lg font-semibold tabular-nums">{qty(article.forecast)}</p><p className="text-xs text-slate-500">{article.forecast!=null?'Forecast units':article.forecastedVariants?`${qty(article.knownForecast)} known units · incomplete`:'Not forecasted'}</p></div>{article.missingVariants>0&&<span className="rounded-full bg-amber-50 px-3 py-1 text-xs text-amber-800">{article.missingVariants} need estimation</span>}<ChevronDown className="h-4 w-4 text-slate-400 group-open:rotate-180"/></div></summary><div className="space-y-3 border-t bg-slate-50 p-4 dark:bg-slate-900">{colors.map(color=>{const variants=article.rows.filter(r=>r.color===color).sort(sizeCompare);const complete=variants.every(v=>v.forecast!=null);return <details key={color} className="rounded-lg border bg-white dark:bg-slate-950"><summary className="flex cursor-pointer items-center justify-between gap-3 p-4 text-sm"><span className="font-medium">{color} <span className="ml-2 font-normal text-slate-500">{variants.length} sizes</span></span><span className="tabular-nums">{complete?qty(variants.reduce((sum,r)=>sum+(r.forecast||0),0)):'Incomplete forecast'}{complete?' units':''}</span></summary><div className="overflow-x-auto border-t"><table className="w-full text-sm"><thead className="bg-slate-50 text-xs text-slate-500 dark:bg-slate-900"><tr><th className="p-3 text-left">Size</th><th className="p-3 text-left">SKU</th><th className="p-3 text-right">Forecast units</th><th className="p-3 text-right">Booked units in interval</th><th className="p-3 text-left">Coverage</th></tr></thead><tbody>{variants.map(r=><tr key={r.size} className="border-t"><td className="p-3 font-medium">{r.size}</td><td className="p-3 text-xs text-slate-500">{r.skus.join(', ')}</td><td className="p-3 text-right font-semibold tabular-nums">{qty(r.forecast)}</td><td className="p-3 text-right tabular-nums">{qty(r.booked)}</td><td className="p-3 text-xs"><span className={r.forecast==null?'text-amber-700':'text-emerald-700'}>{r.forecast==null?'Needs estimation':'Available'}</span></td></tr>)}</tbody></table></div></details>;})}</div></details>;
+ return <details className="group overflow-hidden rounded-[20px] border border-line bg-card shadow-card open:border-brand-200">
+  <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-4 px-[22px] py-[18px] hover:bg-page [&::-webkit-details-marker]:hidden">
+   <div className="flex min-w-0 flex-col gap-1">
+    <p className="flex items-center gap-2 text-xs text-fg-3">{article.brand} <span className="rounded-md bg-soft px-2 py-0.5 font-mono text-fg-2">{article.code}</span></p>
+    <h3 className="text-base font-bold"><span className="font-mono text-brand-700">{article.reference}</span> <span className="ml-1 font-semibold">{article.name}</span></h3>
+    <p className="text-[13px] text-fg-3">{colors.length} colours · {article.rows.length} size variants</p>
+   </div>
+   <div className="flex items-center gap-[18px]">
+    {article.missingVariants>0&&<span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-800">{article.missingVariants} need estimation</span>}
+    <div className="flex flex-col items-end"><p className="font-display text-[22px] font-bold tabular-nums">{qty(article.forecast)}</p><p className="text-xs text-fg-3">{article.forecast!=null?'Forecast units':article.forecastedVariants?`${qty(article.knownForecast)} known units · incomplete`:'Not forecasted'}</p></div>
+    <span className="flex h-8 w-8 items-center justify-center rounded-full border border-line"><CaretDownIcon weight="bold" className="h-[13px] w-[13px] transition-transform group-open:rotate-180"/></span>
+   </div>
+  </summary>
+  <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,380px),1fr))] items-start gap-3 border-t border-line bg-page px-[22px] pb-[22px] pt-4">
+   {colors.map(color=>{const variants=article.rows.filter(r=>r.color===color).sort(sizeCompare);const complete=variants.every(v=>v.forecast!=null);
+    return <details key={color} className="group/color overflow-hidden rounded-2xl border border-line bg-card">
+     <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 text-sm hover:bg-page [&::-webkit-details-marker]:hidden">
+      <span className="flex items-center gap-2 font-bold"><DropIcon weight="fill" className="h-[13px] w-[13px] shrink-0 text-brand"/>{color} <span className="font-normal text-fg-3">{variants.length} sizes</span></span>
+      <span className="flex items-center gap-2.5"><span className={cn('font-bold tabular-nums',complete?'font-mono text-fg-1':'text-brand-800')}>{complete?qty(variants.reduce((sum,r)=>sum+(r.forecast||0),0)):'Incomplete forecast'}{complete?' units':''}</span><CaretDownIcon weight="bold" className="h-3 w-3 text-fg-3 transition-transform group-open/color:rotate-180"/></span>
+     </summary>
+     <div className="overflow-x-auto border-t border-line"><div role="table" aria-label={`${article.reference} ${color} sizes`} className="min-w-[420px]">
+      <div role="row" className={cn(SIZE_GRID,'bg-page px-4 py-2 text-[10px] font-bold uppercase tracking-[0.08em] text-fg-3')}><span role="columnheader">Size</span><span role="columnheader">SKU</span><span role="columnheader" className="text-right">Forecast units</span><span role="columnheader" className="text-right">Booked units in interval</span><span role="columnheader">Coverage</span></div>
+      {variants.map(r=><div role="row" key={r.size} className={cn(SIZE_GRID,'border-t border-line px-4 py-2 text-[13px]')}>
+       <span role="cell" className="font-mono font-bold">{r.size}</span>
+       <span role="cell" title={r.skus.join(', ')} className="truncate font-mono text-[11px] text-fg-3">{r.skus.join(', ')}</span>
+       <span role="cell" className="text-right font-mono font-bold tabular-nums">{qty(r.forecast)}</span>
+       <span role="cell" className="text-right font-mono tabular-nums text-fg-2">{qty(r.booked)}</span>
+       <span role="cell" className={cn('flex items-center gap-1.5 text-xs font-semibold',r.forecast==null?'text-brand-800':'text-success-600')}><span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-current"/>{r.forecast==null?'Needs estimation':'Available'}</span>
+      </div>)}
+     </div></div>
+    </details>;})}
+  </div>
+ </details>;
 }
 
 export default function SeasonalAllocationPage(){
@@ -37,10 +72,63 @@ export default function SeasonalAllocationPage(){
  const dirty=!!draft&&!!data&&(signature(draft)!==signature(data.allocation)||search!==query);
  function apply(){if(!draft)return;setApplied({...draft,codes:[...draft.codes]});setQuery(search);setPage(0);setNotice('');}
  async function save(){if(!draft)return;setBusy(true);setError('');try{const result=await apiClient.put<{notice:string}>('/seasonal-allocation',draft);setApplied({...draft,codes:[...draft.codes]});setQuery(search);setPage(0);setNotice(result.notice);}catch(e){setError(e instanceof Error?e.message:'Could not save allocation.');}finally{setBusy(false);}}
- const codeOption=(option:Allocation['options'][number])=><label key={option.code} className={`flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 ${draft?.codes.includes(option.code)?'border-blue-300 bg-blue-50 text-blue-900 dark:bg-blue-950':'bg-white dark:bg-slate-950'}`}><input type="checkbox" disabled={busy} checked={!!draft?.codes.includes(option.code)} onChange={e=>update({codes:e.target.checked?[...(draft?.codes||[]),option.code]:(draft?.codes||[]).filter(c=>c!==option.code)})}/><span><span className="block text-sm font-semibold">{option.code}</span><span className="text-xs text-slate-500">{option.articles.toLocaleString()} articles</span></span></label>;
- return <AppShell><div className="space-y-6"><header className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-widest text-blue-600">Plan by article season</p><h1 className="mt-2 text-3xl font-semibold">Seasonal allocation</h1><p className="mt-2 max-w-3xl text-sm text-slate-500">Choose article season codes and forecast months. Review the available quantities by article, colour and size.</p></div><ScenarioSwitcher/></header>
- <section className="rounded-xl border bg-white p-5 dark:bg-slate-950"><div className="flex items-center gap-2"><SlidersHorizontal className="h-4 w-4 text-blue-600"/><h2 className="font-semibold">Allocation selection</h2></div><div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"><label className="text-xs text-slate-600">From forecast month<Input aria-label="Allocation start month" className="mt-2" type="month" value={draft?.startMonth||''} disabled={!draft||busy} onChange={e=>update({startMonth:e.target.value})}/></label><label className="text-xs text-slate-600">To forecast month<Input aria-label="Allocation end month" className="mt-2" type="month" value={draft?.endMonth||''} disabled={!draft||busy} onChange={e=>update({endMonth:e.target.value})}/></label><label className="text-xs text-slate-600">Find an article<Input aria-label="Search seasonal articles" className="mt-2" placeholder="Article, name or brand" value={search} onChange={e=>setSearch(e.target.value)}/></label></div><p className="mb-3 mt-5 text-xs font-medium text-slate-600">Article season codes · select one or more</p><div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">{data?.options.filter(o=>currentCodes.includes(o.code)||draft?.codes.includes(o.code)).map(codeOption)}</div>{data&&data.options.some(o=>!currentCodes.includes(o.code)&&!draft?.codes.includes(o.code))&&<details className="mt-4"><summary className="cursor-pointer text-xs text-blue-600">Other catalogue season codes</summary><div className="mt-3 grid gap-3 sm:grid-cols-3 lg:grid-cols-5">{data.options.filter(o=>!currentCodes.includes(o.code)&&!draft?.codes.includes(o.code)).map(codeOption)}</div></details>}<div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t pt-4"><p className="max-w-2xl text-xs leading-5 text-slate-500">Season codes are article attributes. Forecast months follow the published planning interval; recorded orders retain their actual dates. Save this selection for the current planning season.</p><div className="flex gap-2"><Button variant="outline" disabled={!valid||loading||busy} onClick={apply}>Apply selection</Button><Button disabled={!valid||loading||busy} onClick={()=>void save()}><Save className="h-4 w-4"/>{busy?'Saving…':'Save allocation'}</Button></div></div></section>
- {error&&<p role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error} <button className="ml-2 underline" onClick={reset}>Reset selection and retry</button> · <Link href="/setup" className="underline">Open Setup</Link></p>}{notice&&<p role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">{notice}</p>}{dirty&&!loading&&<p role="status" className="text-sm text-blue-700">Selection changed. Apply it to update the quantities below.</p>}
- {data&&<><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{[['Matching articles',data.summary.articles.toLocaleString(),`${data.summary.variants.toLocaleString()} colour / size variants`],['Forecast units · covered variants',data.summary.forecastedVariants?qty(data.summary.knownForecastUnits):'—',`${data.summary.forecastedVariants.toLocaleString()} of ${data.summary.variants.toLocaleString()} variants have forecasts`],['Need estimation',data.summary.missingVariants.toLocaleString(),'Missing forecasts stay unknown'],['Published forecast',`${data.published.startMonth||'—'} → ${data.published.endMonth||'—'}`,`${activeScenario} scenario`]].map(([label,value,subtitle])=><div key={label} className="rounded-xl border bg-white p-5 dark:bg-slate-950"><p className="text-xs text-slate-500">{label}</p><p className="mt-3 text-xl font-semibold tabular-nums">{value}</p><p className="mt-2 text-xs text-slate-500">{subtitle}</p></div>)}</div>{data.notices.length>0&&<div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"><ul className="list-disc space-y-1 pl-5">{data.notices.map(n=><li key={n}>{n}</li>)}</ul><Link href="/setup" className="mt-3 inline-block font-medium underline">Open forecasting setup</Link></div>}<div className="flex flex-wrap items-end justify-between gap-3"><div><h2 className="text-xl font-semibold">Articles in this allocation</h2><p className="mt-1 text-xs text-slate-500">{data.allocation.codes.join(' · ')} · {data.allocation.startMonth} to {data.allocation.endMonth}. Quantities cover all customers. Open an article, then a colour to see its sizes.</p></div></div>{loading?<p role="status" className="rounded-xl border p-8 text-sm text-slate-500">Loading the selected forecast interval…</p>:<div className="space-y-3">{data.rows.map(a=><ArticleAllocation key={a.reference} article={a}/>)}{!data.rows.length&&<p className="rounded-xl border p-8 text-sm text-slate-500">No articles match this selection.</p>}</div>}<footer className="flex items-center justify-between gap-3 text-xs text-slate-500"><span>{data.total.toLocaleString()} articles · page {page+1} of {Math.max(1,Math.ceil(data.total/20))}</span><div className="flex gap-2"><Button size="sm" variant="outline" disabled={loading||page===0} onClick={()=>setPage(p=>p-1)}>Previous</Button><Button size="sm" variant="outline" disabled={loading||(page+1)*20>=data.total} onClick={()=>setPage(p=>p+1)}>Next</Button></div></footer><p className="text-xs leading-5 text-slate-500">These are saved monthly demand forecasts, with fractional expected units retained. A zero is a recorded zero forecast; “—” means no complete forecast is available. Generate another date interval in Setup. <Link href="/budget" className="text-blue-600 underline">Review purchase quantities and financial limits in Budget Tracker.</Link></p></>}{loading&&!data&&<p role="status" className="p-6 text-sm text-slate-500">Loading article seasons and published quantities…</p>}
- </div></AppShell>;
+ const codeOption=(option:Allocation['options'][number])=>{const on=!!draft?.codes.includes(option.code);return <label key={option.code} className={cn('flex cursor-pointer items-center gap-3 rounded-[18px] border-2 p-4 text-fg-1 transition-colors hover:border-brand has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60 has-[:focus-visible]:shadow-[0_0_0_3px_rgba(245,130,32,0.35)]',on?'border-brand bg-brand-soft':'border-line bg-card')}>
+  <input type="checkbox" className="sr-only" disabled={busy} checked={on} onChange={e=>update({codes:e.target.checked?[...(draft?.codes||[]),option.code]:(draft?.codes||[]).filter(c=>c!==option.code)})}/>
+  {on?<CheckCircleIcon weight="fill" aria-hidden className="h-[22px] w-[22px] shrink-0 text-brand"/>:<CircleIcon aria-hidden className="h-[22px] w-[22px] shrink-0 text-fg-4"/>}
+  <span className="flex flex-col gap-0.5"><span className="font-mono text-[15px] font-bold">{option.code}</span><span className="text-xs text-fg-3">{option.articles.toLocaleString()} articles</span></span>
+ </label>;};
+ const tiles=data?[
+  {label:'Matching articles',value:data.summary.articles.toLocaleString(),sub:`${data.summary.variants.toLocaleString()} colour / size variants`},
+  {label:'Forecast units · covered variants',value:data.summary.forecastedVariants?qty(data.summary.knownForecastUnits):'—',sub:`${data.summary.forecastedVariants.toLocaleString()} of ${data.summary.variants.toLocaleString()} variants have forecasts`,hero:true},
+  {label:'Need estimation',value:data.summary.missingVariants.toLocaleString(),sub:'Missing forecasts stay unknown',accent:true},
+  {label:'Published forecast',value:`${data.published.startMonth||'—'} → ${data.published.endMonth||'—'}`,sub:`${activeScenario} scenario`,small:true},
+ ]:[];
+ return <AppShell>
+  <PageHeader eyebrow="Plan by article season" title="Seasonal allocation" description="Choose article season codes and forecast months. Review the available quantities by article, colour and size." actions={<ScenarioSwitcher/>}/>
+
+  <section className="flex flex-col gap-[22px] rounded-[32px] border border-line bg-card p-6 shadow-card sm:px-8 sm:py-7">
+   <h2 className="flex items-center gap-2.5 text-[22px] font-extrabold tracking-[-0.02em]"><SlidersHorizontalIcon className="h-[22px] w-[22px] text-brand"/>Allocation selection</h2>
+   <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
+    <label className="flex flex-col gap-2 text-[13px] font-semibold text-fg-2">From forecast month<TextField aria-label="Allocation start month" className={MONTH_INPUT} type="month" value={draft?.startMonth||''} disabled={!draft||busy} onChange={e=>update({startMonth:e.target.value})}/></label>
+    <label className="flex flex-col gap-2 text-[13px] font-semibold text-fg-2">To forecast month<TextField aria-label="Allocation end month" className={MONTH_INPUT} type="month" value={draft?.endMonth||''} disabled={!draft||busy} onChange={e=>update({endMonth:e.target.value})}/></label>
+    <label className="flex flex-col gap-2 text-[13px] font-semibold text-fg-2">Find an article<span className="relative flex items-center"><MagnifyingGlassIcon aria-hidden className="pointer-events-none absolute left-3.5 h-4 w-4 text-fg-3"/><TextField aria-label="Search seasonal articles" className="h-12 w-full rounded-[14px] pl-10 text-[15px] font-normal" placeholder="Article, name or brand" value={search} onChange={e=>setSearch(e.target.value)}/></span></label>
+   </div>
+   <div className="flex flex-col gap-2.5">
+    <p className="text-[13px] font-semibold text-fg-2">Article season codes · select one or more</p>
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3">{data?.options.filter(o=>currentCodes.includes(o.code)||draft?.codes.includes(o.code)).map(codeOption)}</div>
+    {data&&data.options.some(o=>!currentCodes.includes(o.code)&&!draft?.codes.includes(o.code))&&<details className="group/other">
+     <summary className="flex w-fit cursor-pointer list-none items-center gap-1.5 py-1 text-[13px] font-bold text-brand-700 hover:text-brand-800 [&::-webkit-details-marker]:hidden">Other catalogue season codes<CaretDownIcon weight="bold" className="h-3 w-3 transition-transform group-open/other:rotate-180"/></summary>
+     <div className="mt-3 grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3">{data.options.filter(o=>!currentCodes.includes(o.code)&&!draft?.codes.includes(o.code)).map(codeOption)}</div>
+    </details>}
+   </div>
+   <div className="flex flex-wrap items-center justify-between gap-4 border-t border-line pt-5">
+    <p className="max-w-[640px] flex-[1_1_360px] text-pretty text-[13px] leading-relaxed text-fg-2">Season codes are article attributes. Forecast months follow the published planning interval; recorded orders retain their actual dates. Save this selection for the current planning season.</p>
+    <div className="flex flex-wrap gap-2.5"><BrandButton variant="outline" disabled={!valid||loading||busy} onClick={apply}>Apply selection</BrandButton><BrandButton disabled={!valid||loading||busy} onClick={()=>void save()}><FloppyDiskIcon/>{busy?'Saving…':'Save allocation'}</BrandButton></div>
+   </div>
+  </section>
+
+  {error&&<Notice tone="danger">{error} <button type="button" className="ml-2 font-bold text-danger underline underline-offset-2" onClick={reset}>Reset selection and retry</button> · <Link href="/setup" className="font-bold text-brand-700 underline underline-offset-2">Open Setup</Link></Notice>}
+  {notice&&<Notice tone="success">{notice}</Notice>}
+  {dirty&&!loading&&<p role="status" className="flex items-center gap-2.5 text-sm font-semibold text-brand-800"><ArrowsClockwiseIcon weight="fill" aria-hidden className="h-4 w-4 shrink-0"/>Selection changed. Apply it to update the quantities below.</p>}
+
+  {data&&<>
+   <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
+    {tiles.map(t=><div key={t.label} className={cn('relative flex flex-col gap-1.5 overflow-hidden rounded-3xl p-[22px]',t.hero?'bg-champagne':'border border-line bg-card shadow-card')}>
+     {t.hero&&<span aria-hidden className="absolute -right-[50px] -top-[60px] h-[170px] w-[170px] rounded-full bg-[radial-gradient(circle,var(--glow),rgba(245,130,32,0)_70%)]"/>}
+     <p className={cn('relative text-[13px] font-semibold',t.hero?'text-brand-800':'text-fg-2')}>{t.label}</p>
+     <p className={cn('relative font-display font-bold tabular-nums',t.small?'text-2xl':'text-[32px]',t.accent&&'text-brand-700')}>{t.value}</p>
+     <p className={cn('relative text-[13px]',t.hero?'text-fg-2':'text-fg-3')}>{t.sub}</p>
+    </div>)}
+   </div>
+   {data.notices.length>0&&<div role="status" className="flex items-start gap-3 rounded-2xl border border-brand-200 bg-brand-50 px-[18px] py-4 text-sm leading-[1.55]">
+    <WarningIcon weight="fill" aria-hidden className="mt-0.5 h-[18px] w-[18px] shrink-0 text-brand-700"/>
+    <div className="flex flex-col gap-2"><ul className="list-disc space-y-1 pl-5">{data.notices.map(n=><li key={n}>{n}</li>)}</ul><Link href="/setup" className="flex w-fit items-center gap-1.5 font-bold text-brand-700 hover:text-brand-800">Open forecasting setup<ArrowRightIcon className="h-4 w-4"/></Link></div>
+   </div>}
+   <div className="flex flex-col gap-1"><h2 className="text-[22px] font-extrabold tracking-[-0.02em]">Articles in this allocation</h2><p className="text-[13px] text-fg-3">{data.allocation.codes.join(' · ')} · {data.allocation.startMonth} to {data.allocation.endMonth}. Quantities cover all customers. Open an article, then a colour to see its sizes.</p></div>
+   {loading?<p role="status" className="rounded-[20px] border border-line bg-card p-8 text-sm text-fg-3">Loading the selected forecast interval…</p>:<div className="flex flex-col gap-3">{data.rows.map(a=><ArticleAllocation key={a.reference} article={a}/>)}{!data.rows.length&&<p className="rounded-[20px] border border-line bg-card p-8 text-sm text-fg-3">No articles match this selection.</p>}</div>}
+   <footer className="flex flex-wrap items-center justify-between gap-3 text-[13px] text-fg-3"><span>{data.total.toLocaleString()} articles · page {page+1} of {Math.max(1,Math.ceil(data.total/20))}</span><div className="flex gap-2"><BrandButton size="sm" variant="outline" disabled={loading||page===0} onClick={()=>setPage(p=>p-1)}>Previous</BrandButton><BrandButton size="sm" variant="outline" disabled={loading||(page+1)*20>=data.total} onClick={()=>setPage(p=>p+1)}>Next</BrandButton></div></footer>
+   <p className="max-w-[900px] text-pretty text-[13px] leading-relaxed text-fg-3">These are saved monthly demand forecasts, with fractional expected units retained. A zero is a recorded zero forecast; “—” means no complete forecast is available. Generate another date interval in Setup. <Link href="/budget" className="font-bold text-brand-700 hover:text-brand-800">Review purchase quantities and financial limits in Budget Tracker.</Link></p>
+  </>}
+  {loading&&!data&&<p role="status" className="p-6 text-sm text-fg-3">Loading article seasons and published quantities…</p>}
+ </AppShell>;
 }

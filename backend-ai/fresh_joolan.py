@@ -7,6 +7,7 @@ import math
 import os
 import re
 from pathlib import Path
+import paths
 import sqlite3
 import uuid
 import urllib.error
@@ -15,8 +16,8 @@ import urllib.request
 
 from joolan_client import Client, ExportError, SourceChangedError, RateLimitError, field, spool_value, unspool_value, identifier, sql_value
 
-BASE=Path(__file__).resolve().parent
-SOURCE_DB=BASE/'data/joolan_source.db'
+BASE=paths.HOME
+SOURCE_DB=paths.SOURCE_DB
 REQUIRED_TABLES=('negoce_entetes','negoce_lignes','produits','skus','negoce_clients')
 OPTIONAL_TABLES=('fournisseurs','tarifs','tarifsproduits','produits_min_max','magasins','commandes','commandes_magasins','commandes_produits','commandes_quantites','devises')
 SECRET_FIELDS=('motpasse','password','mot_de_passe','api_key','api-key','secret','token','logo')

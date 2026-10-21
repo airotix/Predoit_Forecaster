@@ -8,6 +8,7 @@ from pathlib import Path
 from fastapi import HTTPException
 from pydantic import BaseModel,SecretStr,Field
 from starlette.responses import JSONResponse
+import paths
 import fresh_joolan as fresh
 
 class FreshRequest(BaseModel):
@@ -21,13 +22,18 @@ class FreshRequest(BaseModel):
 class ResumeRequest(BaseModel):
     apiKey: SecretStr
 
+WORKER_MODULE='fresh_worker'
+
+def worker_command(rid):
+    return [sys.executable,'-B','-u','-m',WORKER_MODULE,rid]
+
 def launch(rid,key):
     if not key.strip():raise ValueError('Enter an API key.')
     flags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0
     try:
-        p=subprocess.Popen([sys.executable,'-B','-u',str(Path(__file__).with_name('fresh_worker.py')),rid],
+        p=subprocess.Popen(worker_command(rid),
             stdin=subprocess.PIPE,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,text=True,
-            cwd=Path(__file__).parent,creationflags=flags)
+            cwd=paths.CODE_DIR,creationflags=flags)
         p.stdin.write(json.dumps({'apiKey':key})+'\n');p.stdin.close()
     except Exception:
         c=fresh.connect();fresh.update(c,rid,status='needs_credentials',error='Worker could not start. Re-enter the key to resume.');c.close()

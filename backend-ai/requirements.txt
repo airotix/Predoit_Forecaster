@@ -1,18 +1,8 @@
-# Python forecasting stack lives in repository roots `preduit-engine/` and `preduit-app/`.
-# From the Forecaster-orgy repository root, run:
-#
-#   pip install -r requirements-preduit.txt
-#
-# The current fresh-Joolan runtime also lives in backend-ai; see ../QUICK_START.md.
-pandas>=2.0.0
-numpy>=1.23.0
+# Full dependency set, including the archived SARIMA/SHAP scripts (m4_sarima, m5_catboost).
+# The live API only needs requirements-runtime.txt; that is what the Docker image installs.
+# Run the app from this folder:  python -m uvicorn api_server:app --host 127.0.0.1 --port 4000
+# See ../QUICK_START.md and ../docs/MIGRATION_PLAN.md.
+-r requirements-runtime.txt
 pmdarima>=2.0.0
 statsmodels>=0.13.0
-catboost>=1.2
 shap>=0.42.0
-scikit-learn>=1.2.0
-openpyxl>=3.0.0
-fastapi
-python-multipart
-python-dotenv>=1.0.0
-uvicorn[standard]

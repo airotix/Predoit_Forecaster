@@ -8,6 +8,7 @@ import sys
 import time
 import uuid
 from pathlib import Path
+import paths
 import fresh_joolan as fresh
 import server_credentials
 
@@ -81,11 +82,16 @@ def create(serving,start,end,path=None):
         return record
     finally:c.close()
 
+WORKER_MODULE='automatic_worker'
+
+def worker_command(jid):
+    return [sys.executable,'-B','-u','-m',WORKER_MODULE,jid]
+
 def launch(jid):
     flags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0
     try:
-        process=subprocess.Popen([sys.executable,'-B','-u',str(Path(__file__).with_name('automatic_worker.py')),jid],
-            cwd=Path(__file__).parent,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,creationflags=flags)
+        process=subprocess.Popen(worker_command(jid),
+            cwd=paths.CODE_DIR,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,creationflags=flags)
         c=fresh.connect()
         try:
             ensure(c);record=read(c,jid)

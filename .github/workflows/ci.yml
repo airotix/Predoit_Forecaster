@@ -22,6 +22,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install ./preduit-engine[dev] ./preduit-app[dev]
           pip install -r backend-ai/requirements.txt
+          pip install httpx
 
       - name: Run engine tests
         working-directory: preduit-engine
@@ -31,9 +32,30 @@ jobs:
         working-directory: preduit-app
         run: pytest -q
 
-      - name: Run fresh Joolan workflow tests
+      # Includes the Phase 0 behaviour lock (docs/MIGRATION_PLAN.md): route contract,
+      # default data locations and golden-master forecast/API snapshots.
+      - name: Run live backend tests (fresh Joolan workflow + Phase 0 lock)
         working-directory: backend-ai
         run: python -B -m unittest discover -s tests
+
+  docker:
+    name: Backend image builds and serves
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build backend image
+        run: docker build -t preduit-backend .
+
+      - name: Smoke test
+        run: |
+          docker run -d --name api -p 4000:4000 -e FORECASTER_ALLOW_NON_LOCAL=1 preduit-backend
+          for i in $(seq 1 45); do
+            curl -fsS http://localhost:4000/health && exit 0
+            sleep 2
+          done
+          docker logs api
+          exit 1
 
   frontend:
     name: Frontend lint + test + build

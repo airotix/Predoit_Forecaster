@@ -11,16 +11,13 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent
+import paths
+BASE_DIR = paths.HOME
 
 
 def _resolve_db_file() -> Path:
-    override = (os.environ.get("FORECASTER_DB_PATH") or "").strip()
-    if override:
-        return Path(override).expanduser().resolve()
-    data_path = BASE_DIR / "data" / "joolan_live.db"
-    # One deterministic default; use FORECASTER_DB_PATH for a different database.
-    return data_path
+    # One deterministic default (paths.LIVE_DB); FORECASTER_DB_PATH overrides it.
+    return paths.LIVE_DB
 
 
 DB_FILE = _resolve_db_file()

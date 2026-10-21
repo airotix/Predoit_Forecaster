@@ -4,8 +4,14 @@
 #   2. docker compose up --build
 #   3. frontend → http://localhost:3000   backend → http://localhost:4000
 #
-# The SQLite DB, pipeline outputs, and (optionally) the raw source CSV live on the
-# `preduit-data` volume so they survive restarts and rebuilds.
+# The backend is the live API in backend-ai/. Its databases (serving, Joolan source,
+# history), exports and saved outputs live on named volumes so they survive restarts.
+#
+# Security: with authentication OFF the API has no sign-in, so the backend port is bound to
+# this machine only (BACKEND_BIND=127.0.0.1) and FORECASTER_ALLOW_NON_LOCAL lets the container
+# accept the forwarded connection. To serve other machines, turn authentication ON
+# (FORECASTER_AUTH_ENABLED=true, FORECASTER_AUTH_SECRET, and NEXT_PUBLIC_AUTH_ENABLED=true
+# at build time) and then set BACKEND_BIND=0.0.0.0. Never expose it with authentication off.
 
 services:
   backend:
@@ -14,18 +20,17 @@ services:
       dockerfile: Dockerfile
     image: preduit-backend:latest
     ports:
-      - "4000:4000"
+      - "${BACKEND_BIND:-127.0.0.1}:4000:4000"
     env_file:
       - .env
     environment:
-      # Container-local paths (override the legacy backend-ai/ anchor).
-      FORECASTER_DB_PATH: /data/forecast.db
-      FORECASTER_OUTPUT_DIR: /data/output
       FORECASTER_API_RELOAD: "false"
-      # Allow the browser origin served by the frontend container.
-      FORECASTER_CORS_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000"
+      FORECASTER_ALLOW_NON_LOCAL: "${FORECASTER_ALLOW_NON_LOCAL:-1}"
+      # Exact browser origin(s) of the frontend.
+      FORECASTER_CORS_ORIGINS: "${FORECASTER_CORS_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}"
     volumes:
-      - preduit-data:/data
+      - preduit-backend-data:/app/backend-ai/data
+      - preduit-backend-output:/app/backend-ai/output
     restart: unless-stopped
 
   frontend:
@@ -49,4 +54,5 @@ services:
     restart: unless-stopped
 
 volumes:
-  preduit-data:
+  preduit-backend-data:
+  preduit-backend-output:

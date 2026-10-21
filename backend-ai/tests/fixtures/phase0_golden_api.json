@@ -1,0 +1,1431 @@
+{
+ "/api/articles": [
+  200,
+  [
+   {
+    "colors": [
+     "BLK",
+     "RED"
+    ],
+    "cost": 7.591,
+    "customer": "\u00e2\u20ac\u201d",
+    "demandTrend": [
+     {
+      "date": "2025-01",
+      "value": 77.5999
+     },
+     {
+      "date": "2025-02",
+      "value": 81.5
+     },
+     {
+      "date": "2025-03",
+      "value": 110.75
+     },
+     {
+      "date": "2025-04",
+      "value": 108.8
+     },
+     {
+      "date": "2025-05",
+      "value": 75.6501
+     },
+     {
+      "date": "2025-06",
+      "value": 79.55
+     }
+    ],
+    "family": "Tops",
+    "id": "REF1",
+    "matrix": {
+     "BLK": {
+      "L": {
+       "forecast": 91,
+       "orders": 0,
+       "stock": 5
+      },
+      "M": {
+       "forecast": 89,
+       "orders": 0,
+       "stock": 4
+      },
+      "S": {
+       "forecast": 88,
+       "orders": 0,
+       "stock": 3
+      }
+     },
+     "RED": {
+      "L": {
+       "forecast": 86,
+       "orders": 0,
+       "stock": 5
+      },
+      "M": {
+       "forecast": 85,
+       "orders": 0,
+       "stock": 4
+      },
+      "S": {
+       "forecast": 92,
+       "orders": 0,
+       "stock": 3
+      }
+     }
+    },
+    "model": "UNKNOWN",
+    "price": 20.0,
+    "season": "S",
+    "sizes": [
+     "S",
+     "M",
+     "L"
+    ],
+    "supplier": "UNKNOWN",
+    "theme": "UNKNOWN"
+   },
+   {
+    "colors": [
+     "BLU"
+    ],
+    "cost": 9.4706,
+    "customer": "\u00e2\u20ac\u201d",
+    "demandTrend": [
+     {
+      "date": "2025-01",
+      "value": 23.0
+     },
+     {
+      "date": "2025-02",
+      "value": 26.0
+     },
+     {
+      "date": "2025-03",
+      "value": 36.0
+     },
+     {
+      "date": "2025-04",
+      "value": 39.0
+     },
+     {
+      "date": "2025-05",
+      "value": 26.0
+     },
+     {
+      "date": "2025-06",
+      "value": 20.0
+     }
+    ],
+    "family": "Bottoms",
+    "id": "REF2",
+    "matrix": {
+     "BLU": {
+      "L": {
+       "forecast": 88,
+       "orders": 0,
+       "stock": 4
+      },
+      "M": {
+       "forecast": 82,
+       "orders": 0,
+       "stock": 3
+      }
+     }
+    },
+    "model": "UNKNOWN",
+    "price": 25.0,
+    "season": "S",
+    "sizes": [
+     "M",
+     "L"
+    ],
+    "supplier": "UNKNOWN",
+    "theme": "UNKNOWN"
+   },
+   {
+    "colors": [
+     "BLK",
+     "WHT"
+    ],
+    "cost": 11.4514,
+    "customer": "\u00e2\u20ac\u201d",
+    "demandTrend": [
+     {
+      "date": "2025-01",
+      "value": 43.0
+     },
+     {
+      "date": "2025-02",
+      "value": 48.0
+     },
+     {
+      "date": "2025-03",
+      "value": 85.0
+     },
+     {
+      "date": "2025-04",
+      "value": 81.0
+     },
+     {
+      "date": "2025-05",
+      "value": 45.0
+     },
+     {
+      "date": "2025-06",
+      "value": 50.0
+     }
+    ],
+    "family": "Tops",
+    "id": "REF3",
+    "matrix": {
+     "BLK": {
+      "M": {
+       "forecast": 86,
+       "orders": 0,
+       "stock": 4
+      },
+      "S": {
+       "forecast": 89,
+       "orders": 0,
+       "stock": 3
+      }
+     },
+     "WHT": {
+      "M": {
+       "forecast": 86,
+       "orders": 0,
+       "stock": 4
+      },
+      "S": {
+       "forecast": 89,
+       "orders": 0,
+       "stock": 3
+      }
+     }
+    },
+    "model": "UNKNOWN",
+    "price": 30.0,
+    "season": "S",
+    "sizes": [
+     "S",
+     "M"
+    ],
+    "supplier": "UNKNOWN",
+    "theme": "UNKNOWN"
+   }
+  ]
+ ],
+ "/api/budget": [
+  200,
+  {
+   "categories": [
+    {
+     "budgetPercent": 0,
+     "category": "Bottoms",
+     "marginPercent": 60.0,
+     "purchaseCost": 1610.0,
+     "skus": [],
+     "status": "on_target"
+    },
+    {
+     "budgetPercent": 0,
+     "category": "Tops",
+     "marginPercent": 60.0,
+     "purchaseCost": 8038.8,
+     "skus": [],
+     "status": "on_target"
+    }
+   ],
+   "financialComplete": true,
+   "missingInputRows": 0,
+   "summary": {
+    "budgetUsage": 0,
+    "currency": "EUR",
+    "expectedTurnover": 25487.0,
+    "financialComplete": true,
+    "grossMargin": 15292.2,
+    "grossMarginPercent": 60.0,
+    "missingInputRows": 0,
+    "seasonBudget": 0,
+    "targetMargin": 0,
+    "totalPurchaseCost": 9648.8
+   }
+  }
+ ],
+ "/api/customers": [
+  200,
+  {
+   "coverage": {
+    "activeCustomers": 2,
+    "activeSince": "2022-12-05",
+    "asOf": "2024-12-05",
+    "definition": "Ordering coverage: active customers with positive booked demand in the selected season / customers with positive demand in the last 24 data months. Not visit coverage or a forecast.",
+    "orderedActiveCustomers": 0,
+    "orderingCoverage": 0.0,
+    "seasonCustomers": 0,
+    "seasonEnd": null,
+    "seasonName": null,
+    "seasonStart": null,
+    "seasonUnits": 0.0
+   },
+   "customers": [
+    {
+     "active": true,
+     "country": "UNKNOWN",
+     "firstOrder": "2022-01-05",
+     "id": "C0",
+     "lastOrder": "2024-12-05",
+     "lastPositiveOrder": "2024-12-05",
+     "name": "Customer 0",
+     "orderedInSeason": false,
+     "productCount": 3,
+     "seasonOrderCount": 0,
+     "seasonUnits": 0.0,
+     "totalSpend": 0.0,
+     "totalUnits": 2813.0
+    },
+    {
+     "active": true,
+     "country": "UNKNOWN",
+     "firstOrder": "2022-01-05",
+     "id": "C1",
+     "lastOrder": "2024-12-05",
+     "lastPositiveOrder": "2024-12-05",
+     "name": "Customer 1",
+     "orderedInSeason": false,
+     "productCount": 3,
+     "seasonOrderCount": 0,
+     "seasonUnits": 0.0,
+     "totalSpend": 0.0,
+     "totalUnits": 2783.0
+    }
+   ],
+   "total": 2
+  }
+ ],
+ "/api/dashboard": [
+  200,
+  {
+   "confidenceDistribution": {
+    "medium": 5
+   },
+   "financialComplete": true,
+   "financialSummary": {
+    "budgetTotal": 0,
+    "budgetUsed": 9648.8,
+    "coverage": 100.0,
+    "expectedTurnover": 25487.0,
+    "margin": 60.0,
+    "targetMargin": 0,
+    "totalPurchaseCost": 9648.8
+   },
+   "kpis": [
+    {
+     "label": "Total Forecast Units",
+     "subLabel": "5 SKUs",
+     "trend": "neutral",
+     "trendValue": 0,
+     "value": "1,055.85"
+    },
+    {
+     "label": "Undelivered Order Balance",
+     "subLabel": "Across recorded customer orders",
+     "trend": "neutral",
+     "trendValue": 0,
+     "value": "0"
+    },
+    {
+     "label": "Budget Usage",
+     "subLabel": "EUR 9,649 / 0",
+     "trend": "neutral",
+     "trendValue": 0,
+     "value": "0%"
+    },
+    {
+     "label": "Gross Margin",
+     "subLabel": "EUR 15,292",
+     "trend": "up",
+     "trendValue": 60.0,
+     "value": "60.0%"
+    },
+    {
+     "label": "Customer Activity",
+     "subLabel": "2 / 2 ordered in the latest 6 data months",
+     "trend": "neutral",
+     "trendValue": 0,
+     "value": "100.0%"
+    },
+    {
+     "label": "Risk Items",
+     "subLabel": "Low-confidence SKUs",
+     "trend": "up",
+     "trendValue": 0,
+     "value": "0"
+    }
+   ],
+   "missingInputRows": 0,
+   "totalSKUs": 5
+  }
+ ],
+ "/api/export?format=json": [
+  200,
+  [
+   {
+    "couleur": "BLK",
+    "demand_forecast": 91.2308,
+    "final_quantity": 85.2308,
+    "financial_note": "Actual SKU costs and inventory supplied.",
+    "manual_override": null,
+    "purchase_cost": 681.8464,
+    "recommended_quantity": 85.2308,
+    "reference": "REF1",
+    "scenario": "base",
+    "taille": "L",
+    "turnover": 1824.616
+   },
+   {
+    "couleur": "BLK",
+    "demand_forecast": 89.7269,
+    "final_quantity": 84.7269,
+    "financial_note": "Actual SKU costs and inventory supplied.",
+    "manual_override": null,
+    "purchase_cost": 677.8152,
+    "recommended_quantity": 84.7269,
+    "reference": "REF1",
+    "scenario": "base",
+    "taille": "M",
+    "turnover": 1794.538
+   },
+   {
+    "couleur": "BLK",
+    "demand_forecast": 88.223,
+    "final_quantity": 84.223,
+    "financial_note": "Actual SKU costs and inventory supplied.",
+    "manual_override": null,
+    "purchase_cost": 673.784,
+    "recommended_quantity": 84.223,
+    "reference": "REF1",
+    "scenario": "base",
+    "taille": "S",
+    "turnover": 1764.46
+   },
+   {
+    "couleur": "RED",
+    "demand_forecast": 86.7193,
+    "final_quantity": 80.7193,
+    "financial_note": "Actual SKU costs and inventory supplied.",
+    "manual_override": null,
+    "purchase_cost": 645.7544,
+    "recommended_quantity": 80.7193,
+    "reference": "REF1",
+    "scenario": "base",
+    "taille": "L",
+    "turnover": 1734.386
+   },
+   {
+    "couleur": "RED",
+    "demand_forecast": 85.2155,
+    "final_quantity": 80.2155,
+    "financial_note": "Actual SKU costs and inventory supplied.",
+    "manual_override": null,
+    "purchase_cost": 641.724,
+    "recommended_quantity": 80.2155,
+    "reference": "REF1",
+    "scenario": "base",
+    "taille": "M",
+    "turnover": 1704.31
+   },
+   {
+    "couleur": "RED",
+    "demand_forecast": 92.7345,
+    "final_quantity": 88.7345,
+    "financial_note": "Actual SKU costs and inventory supplied.",
+    "manual_override": null,
+    "purchase_cost": 709.876,
+    "recommended_quantity": 88.7345,
+    "reference": "REF1",
+    "scenario": "base",
+    "taille": "S",
+    "turnover": 1854.69
+   },
+   {
+    "couleur": "BLU",
+    "demand_forecast": 88.0,
+    "final_quantity": 83.0,
+    "financial_note": "Actual SKU costs and inventory supplied.",
+    "manual_override": null,
+    "purchase_cost": 830.0,
+    "recommended_quantity": 83.0,
+    "reference": "REF2",
+    "scenario": "base",
+    "taille": "L",
+    "turnover": 2200.0
+   },
+   {
+    "couleur": "BLU",
+    "demand_forecast": 82.0,
+    "final_quantity": 78.0,
+    "financial_note": "Actual SKU costs and inventory supplied.",
+    "manual_override": null,
+    "purchase_cost": 780.0,
+    "recommended_quantity": 78.0,
+    "reference": "REF2",
+    "scenario": "base",
+    "taille": "M",
+    "turnover": 2050.0
+   },
+   {
+    "couleur": "BLK",
+    "demand_forecast": 86.5,
+    "final_quantity": 81.5,
+    "financial_note": "Actual SKU costs and inventory supplied.",
+    "manual_override": null,
+    "purchase_cost": 978.0,
+    "recommended_quantity": 81.5,
+    "reference": "REF3",
+    "scenario": "base",
+    "taille": "M",
+    "turnover": 2595.0
+   },
+   {
+    "couleur": "BLK",
+    "demand_forecast": 89.5,
+    "final_quantity": 85.5,
+    "financial_note": "Actual SKU costs and inventory supplied.",
+    "manual_override": null,
+    "purchase_cost": 1026.0,
+    "recommended_quantity": 85.5,
+    "reference": "REF3",
+    "scenario": "base",
+    "taille": "S",
+    "turnover": 2685.0
+   },
+   {
+    "couleur": "WHT",
+    "demand_forecast": 86.5,
+    "final_quantity": 81.5,
+    "financial_note": "Actual SKU costs and inventory supplied.",
+    "manual_override": null,
+    "purchase_cost": 978.0,
+    "recommended_quantity": 81.5,
+    "reference": "REF3",
+    "scenario": "base",
+    "taille": "M",
+    "turnover": 2595.0
+   },
+   {
+    "couleur": "WHT",
+    "demand_forecast": 89.5,
+    "final_quantity": 85.5,
+    "financial_note": "Actual SKU costs and inventory supplied.",
+    "manual_override": null,
+    "purchase_cost": 1026.0,
+    "recommended_quantity": 85.5,
+    "reference": "REF3",
+    "scenario": "base",
+    "taille": "S",
+    "turnover": 2685.0
+   }
+  ]
+ ],
+ "/api/filter-options": [
+  200,
+  {
+   "customers": [
+    "All"
+   ],
+   "families": [
+    "All",
+    "Bottoms",
+    "Tops"
+   ],
+   "models": [
+    "All",
+    "UNKNOWN"
+   ],
+   "seasons": [
+    "All",
+    "S"
+   ],
+   "suppliers": [
+    "All",
+    "UNKNOWN"
+   ],
+   "themes": [
+    "All",
+    "UNKNOWN"
+   ]
+  }
+ ],
+ "/api/pipeline/status": [
+  200,
+  {
+   "status": "ready",
+   "totalRecommendations": 12,
+   "totalSKUs": 5
+  }
+ ],
+ "/api/products": [
+  200,
+  [
+   {
+    "aiConfidence": "medium",
+    "buyingCustomers": 2,
+    "category": "Tops",
+    "demandDefinition": "Delivered plus remaining units",
+    "depthPerCustomer": 792.0,
+    "diffusionRate": 1.0,
+    "forecastEnd": "2025-06",
+    "forecastStart": "2025-01",
+    "forecastUnits": 269.1807,
+    "historicalDemand": 1584.0,
+    "historyEnd": "2024-12",
+    "historyStart": "2022-01",
+    "name": "REF1",
+    "ordersThrough": null,
+    "reorderBuyingCustomers": 2,
+    "reorderCustomers": 2,
+    "reorderDefinition": "Buyers with distinct orders in at least two dated buying seasons / buyers with positive booked demand. Seasons: April\u2013September and October\u2013March (labelled by October year).",
+    "reorderMissingLines": 0,
+    "reorderRate": 1.0,
+    "repeatOrderCustomers": 2,
+    "repeatOrderRate": 1.0,
+    "season": "S",
+    "sizeBreakdown": {
+     "L": 528.0,
+     "M": 528.0,
+     "S": 528.0
+    },
+    "skuId": "REF1|BLK",
+    "status": "SEASONAL",
+    "totalUnitsSold": 1584.0,
+    "trainingCutoff": "2024-12"
+   },
+   {
+    "aiConfidence": "medium",
+    "buyingCustomers": 2,
+    "category": "Tops",
+    "demandDefinition": "Delivered plus remaining units",
+    "depthPerCustomer": 792.0,
+    "diffusionRate": 1.0,
+    "forecastEnd": "2025-06",
+    "forecastStart": "2025-01",
+    "forecastUnits": 264.6693,
+    "historicalDemand": 1584.0,
+    "historyEnd": "2024-12",
+    "historyStart": "2022-01",
+    "name": "REF1",
+    "ordersThrough": null,
+    "reorderBuyingCustomers": 2,
+    "reorderCustomers": 2,
+    "reorderDefinition": "Buyers with distinct orders in at least two dated buying seasons / buyers with positive booked demand. Seasons: April\u2013September and October\u2013March (labelled by October year).",
+    "reorderMissingLines": 0,
+    "reorderRate": 1.0,
+    "repeatOrderCustomers": 2,
+    "repeatOrderRate": 1.0,
+    "season": "S",
+    "sizeBreakdown": {
+     "L": 528.0,
+     "M": 528.0,
+     "S": 528.0
+    },
+    "skuId": "REF1|RED",
+    "status": "SEASONAL",
+    "totalUnitsSold": 1584.0,
+    "trainingCutoff": "2024-12"
+   },
+   {
+    "aiConfidence": "medium",
+    "buyingCustomers": 2,
+    "category": "Tops",
+    "demandDefinition": "Delivered plus remaining units",
+    "depthPerCustomer": 352.0,
+    "diffusionRate": 1.0,
+    "forecastEnd": "2025-06",
+    "forecastStart": "2025-01",
+    "forecastUnits": 176.0,
+    "historicalDemand": 704.0,
+    "historyEnd": "2024-12",
+    "historyStart": "2022-01",
+    "name": "REF3",
+    "ordersThrough": null,
+    "reorderBuyingCustomers": 2,
+    "reorderCustomers": 2,
+    "reorderDefinition": "Buyers with distinct orders in at least two dated buying seasons / buyers with positive booked demand. Seasons: April\u2013September and October\u2013March (labelled by October year).",
+    "reorderMissingLines": 0,
+    "reorderRate": 1.0,
+    "repeatOrderCustomers": 2,
+    "repeatOrderRate": 1.0,
+    "season": "S",
+    "sizeBreakdown": {
+     "M": 355.0,
+     "S": 349.0
+    },
+    "skuId": "REF3|BLK",
+    "status": "SEASONAL",
+    "totalUnitsSold": 704.0,
+    "trainingCutoff": "2024-12"
+   },
+   {
+    "aiConfidence": "medium",
+    "buyingCustomers": 2,
+    "category": "Tops",
+    "demandDefinition": "Delivered plus remaining units",
+    "depthPerCustomer": 352.0,
+    "diffusionRate": 1.0,
+    "forecastEnd": "2025-06",
+    "forecastStart": "2025-01",
+    "forecastUnits": 176.0,
+    "historicalDemand": 704.0,
+    "historyEnd": "2024-12",
+    "historyStart": "2022-01",
+    "name": "REF3",
+    "ordersThrough": null,
+    "reorderBuyingCustomers": 2,
+    "reorderCustomers": 2,
+    "reorderDefinition": "Buyers with distinct orders in at least two dated buying seasons / buyers with positive booked demand. Seasons: April\u2013September and October\u2013March (labelled by October year).",
+    "reorderMissingLines": 0,
+    "reorderRate": 1.0,
+    "repeatOrderCustomers": 2,
+    "repeatOrderRate": 1.0,
+    "season": "S",
+    "sizeBreakdown": {
+     "M": 346.0,
+     "S": 358.0
+    },
+    "skuId": "REF3|WHT",
+    "status": "SEASONAL",
+    "totalUnitsSold": 704.0,
+    "trainingCutoff": "2024-12"
+   },
+   {
+    "aiConfidence": "medium",
+    "buyingCustomers": 2,
+    "category": "Bottoms",
+    "demandDefinition": "Delivered plus remaining units",
+    "depthPerCustomer": 510.0,
+    "diffusionRate": 1.0,
+    "forecastEnd": "2025-06",
+    "forecastStart": "2025-01",
+    "forecastUnits": 170.0,
+    "historicalDemand": 1020.0,
+    "historyEnd": "2024-12",
+    "historyStart": "2022-01",
+    "name": "REF2",
+    "ordersThrough": null,
+    "reorderBuyingCustomers": 2,
+    "reorderCustomers": 2,
+    "reorderDefinition": "Buyers with distinct orders in at least two dated buying seasons / buyers with positive booked demand. Seasons: April\u2013September and October\u2013March (labelled by October year).",
+    "reorderMissingLines": 0,
+    "reorderRate": 1.0,
+    "repeatOrderCustomers": 2,
+    "repeatOrderRate": 1.0,
+    "season": "S",
+    "sizeBreakdown": {
+     "L": 528.0,
+     "M": 492.0
+    },
+    "skuId": "REF2|BLU",
+    "status": "SEASONAL",
+    "totalUnitsSold": 1020.0,
+    "trainingCutoff": "2024-12"
+   }
+  ]
+ ],
+ "/api/projections": [
+  200,
+  [
+   {
+    "category": "Tops",
+    "confidence": "medium",
+    "explainability": {
+     "confirmedOrders": {
+      "customerCount": 2,
+      "units": 0.0
+     },
+     "keySignals": {
+      "customerCluster": "Not modeled",
+      "depthPerCustomer": 792.0,
+      "diffusionRate": 1.0,
+      "scenarioMultiplier": 1.0
+     },
+     "nonVisitedDemand": {
+      "clusterProfile": "Not modeled",
+      "matchedCustomers": 0,
+      "units": 0
+     },
+     "probableReorders": {
+      "likelyCustomers": 0,
+      "reorderRate": 1.0,
+      "units": 533.85
+     }
+    },
+    "projectionBasis": "season_bookings",
+    "scenarios": {
+     "base": {
+      "confirmed": 0.0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 533.85,
+      "total": 533.85
+     },
+     "conservative": {
+      "confirmed": 0.0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 0.0,
+      "total": 0.0
+     },
+     "optimistic": {
+      "confirmed": 0.0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 1067.7002,
+      "total": 1067.7002
+     }
+    },
+    "skuId": "SKU-REF1",
+    "skuName": "REF1"
+   },
+   {
+    "category": "Tops",
+    "confidence": "medium",
+    "explainability": {
+     "confirmedOrders": {
+      "customerCount": 2,
+      "units": 0.0
+     },
+     "keySignals": {
+      "customerCluster": "Not modeled",
+      "depthPerCustomer": 352.0,
+      "diffusionRate": 1.0,
+      "scenarioMultiplier": 1.0
+     },
+     "nonVisitedDemand": {
+      "clusterProfile": "Not modeled",
+      "matchedCustomers": 0,
+      "units": 0
+     },
+     "probableReorders": {
+      "likelyCustomers": 0,
+      "reorderRate": 1.0,
+      "units": 352.0
+     }
+    },
+    "projectionBasis": "season_bookings",
+    "scenarios": {
+     "base": {
+      "confirmed": 0.0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 352.0,
+      "total": 352.0
+     },
+     "conservative": {
+      "confirmed": 0.0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 0.0,
+      "total": 0.0
+     },
+     "optimistic": {
+      "confirmed": 0.0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 704.0,
+      "total": 704.0
+     }
+    },
+    "skuId": "SKU-REF3",
+    "skuName": "REF3"
+   },
+   {
+    "category": "Bottoms",
+    "confidence": "medium",
+    "explainability": {
+     "confirmedOrders": {
+      "customerCount": 2,
+      "units": 0.0
+     },
+     "keySignals": {
+      "customerCluster": "Not modeled",
+      "depthPerCustomer": 510.0,
+      "diffusionRate": 1.0,
+      "scenarioMultiplier": 1.0
+     },
+     "nonVisitedDemand": {
+      "clusterProfile": "Not modeled",
+      "matchedCustomers": 0,
+      "units": 0
+     },
+     "probableReorders": {
+      "likelyCustomers": 0,
+      "reorderRate": 1.0,
+      "units": 170.0
+     }
+    },
+    "projectionBasis": "season_bookings",
+    "scenarios": {
+     "base": {
+      "confirmed": 0.0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 170.0,
+      "total": 170.0
+     },
+     "conservative": {
+      "confirmed": 0.0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 0.0,
+      "total": 0.0
+     },
+     "optimistic": {
+      "confirmed": 0.0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 340.0,
+      "total": 340.0
+     }
+    },
+    "skuId": "SKU-REF2",
+    "skuName": "REF2"
+   }
+  ]
+ ],
+ "/api/recommendations": [
+  200,
+  [
+   {
+    "category": "Tops",
+    "confidence": "medium",
+    "currentScenarioTotal": 269.1807,
+    "draftVersion": null,
+    "explainability": {
+     "confirmedOrders": {
+      "customerCount": 2,
+      "units": 0
+     },
+     "keySignals": {
+      "customerCluster": "Not modeled",
+      "depthPerCustomer": 792.0,
+      "diffusionRate": 1.0,
+      "scenarioMultiplier": 1.0
+     },
+     "nonVisitedDemand": {
+      "clusterProfile": "Not modeled",
+      "matchedCustomers": 0,
+      "units": 0
+     },
+     "probableReorders": {
+      "likelyCustomers": 0,
+      "reorderRate": 1.0,
+      "units": 0
+     }
+    },
+    "financialImpact": {
+     "budgetImpactPercent": 0,
+     "complete": true,
+     "expectedTurnover": 5383.61,
+     "grossMargin": 3230.17,
+     "marginPercent": 60.0,
+     "purchaseCost": 2033.45
+    },
+    "forecastRun": null,
+    "historicalSizes": {
+     "L": 528.0,
+     "M": 528.0,
+     "S": 528.0
+    },
+    "locked": false,
+    "purchaseTotals": {
+     "base": 254.1807,
+     "conservative": 0.0,
+     "optimistic": 523.3615
+    },
+    "scenarios": {
+     "base": {
+      "confirmed": 0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 269.1807,
+      "total": 269.1807
+     },
+     "conservative": {
+      "confirmed": 0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 0,
+      "total": 0
+     },
+     "optimistic": {
+      "confirmed": 0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 538.3615,
+      "total": 538.3615
+     }
+    },
+    "sizeBreakdown": [
+     {
+      "blocked": false,
+      "finalQty": 84.223,
+      "forecast": 88.223,
+      "manualOverride": null,
+      "maxUnits": null,
+      "minUnits": null,
+      "recommended": 84.223,
+      "rounding": null,
+      "size": "S",
+      "statusReason": ""
+     },
+     {
+      "blocked": false,
+      "finalQty": 84.7269,
+      "forecast": 89.7269,
+      "manualOverride": null,
+      "maxUnits": null,
+      "minUnits": null,
+      "recommended": 84.7269,
+      "rounding": null,
+      "size": "M",
+      "statusReason": ""
+     },
+     {
+      "blocked": false,
+      "finalQty": 85.2308,
+      "forecast": 91.2308,
+      "manualOverride": null,
+      "maxUnits": null,
+      "minUnits": null,
+      "recommended": 85.2308,
+      "rounding": null,
+      "size": "L",
+      "statusReason": ""
+     }
+    ],
+    "skuId": "REF1|BLK",
+    "skuName": "REF1 \u00e2\u20ac\u201d BLK",
+    "status": "pending"
+   },
+   {
+    "category": "Tops",
+    "confidence": "medium",
+    "currentScenarioTotal": 264.6693,
+    "draftVersion": null,
+    "explainability": {
+     "confirmedOrders": {
+      "customerCount": 2,
+      "units": 0
+     },
+     "keySignals": {
+      "customerCluster": "Not modeled",
+      "depthPerCustomer": 792.0,
+      "diffusionRate": 1.0,
+      "scenarioMultiplier": 1.0
+     },
+     "nonVisitedDemand": {
+      "clusterProfile": "Not modeled",
+      "matchedCustomers": 0,
+      "units": 0
+     },
+     "probableReorders": {
+      "likelyCustomers": 0,
+      "reorderRate": 1.0,
+      "units": 0
+     }
+    },
+    "financialImpact": {
+     "budgetImpactPercent": 0,
+     "complete": true,
+     "expectedTurnover": 5293.39,
+     "grossMargin": 3176.03,
+     "marginPercent": 60.0,
+     "purchaseCost": 1997.35
+    },
+    "forecastRun": null,
+    "historicalSizes": {
+     "L": 528.0,
+     "M": 528.0,
+     "S": 528.0
+    },
+    "locked": false,
+    "purchaseTotals": {
+     "base": 249.6693,
+     "conservative": 0.0,
+     "optimistic": 514.3387
+    },
+    "scenarios": {
+     "base": {
+      "confirmed": 0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 264.6693,
+      "total": 264.6693
+     },
+     "conservative": {
+      "confirmed": 0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 0,
+      "total": 0
+     },
+     "optimistic": {
+      "confirmed": 0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 529.3387,
+      "total": 529.3387
+     }
+    },
+    "sizeBreakdown": [
+     {
+      "blocked": false,
+      "finalQty": 88.7345,
+      "forecast": 92.7345,
+      "manualOverride": null,
+      "maxUnits": null,
+      "minUnits": null,
+      "recommended": 88.7345,
+      "rounding": null,
+      "size": "S",
+      "statusReason": ""
+     },
+     {
+      "blocked": false,
+      "finalQty": 80.2155,
+      "forecast": 85.2155,
+      "manualOverride": null,
+      "maxUnits": null,
+      "minUnits": null,
+      "recommended": 80.2155,
+      "rounding": null,
+      "size": "M",
+      "statusReason": ""
+     },
+     {
+      "blocked": false,
+      "finalQty": 80.7193,
+      "forecast": 86.7193,
+      "manualOverride": null,
+      "maxUnits": null,
+      "minUnits": null,
+      "recommended": 80.7193,
+      "rounding": null,
+      "size": "L",
+      "statusReason": ""
+     }
+    ],
+    "skuId": "REF1|RED",
+    "skuName": "REF1 \u00e2\u20ac\u201d RED",
+    "status": "pending"
+   },
+   {
+    "category": "Tops",
+    "confidence": "medium",
+    "currentScenarioTotal": 176.0,
+    "draftVersion": null,
+    "explainability": {
+     "confirmedOrders": {
+      "customerCount": 2,
+      "units": 0
+     },
+     "keySignals": {
+      "customerCluster": "Not modeled",
+      "depthPerCustomer": 352.0,
+      "diffusionRate": 1.0,
+      "scenarioMultiplier": 1.0
+     },
+     "nonVisitedDemand": {
+      "clusterProfile": "Not modeled",
+      "matchedCustomers": 0,
+      "units": 0
+     },
+     "probableReorders": {
+      "likelyCustomers": 0,
+      "reorderRate": 1.0,
+      "units": 0
+     }
+    },
+    "financialImpact": {
+     "budgetImpactPercent": 0,
+     "complete": true,
+     "expectedTurnover": 5280.0,
+     "grossMargin": 3168.0,
+     "marginPercent": 60.0,
+     "purchaseCost": 2004.0
+    },
+    "forecastRun": null,
+    "historicalSizes": {
+     "M": 355.0,
+     "S": 349.0
+    },
+    "locked": false,
+    "purchaseTotals": {
+     "base": 167.0,
+     "conservative": 0.0,
+     "optimistic": 343.0
+    },
+    "scenarios": {
+     "base": {
+      "confirmed": 0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 176.0,
+      "total": 176.0
+     },
+     "conservative": {
+      "confirmed": 0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 0,
+      "total": 0
+     },
+     "optimistic": {
+      "confirmed": 0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 352.0,
+      "total": 352.0
+     }
+    },
+    "sizeBreakdown": [
+     {
+      "blocked": false,
+      "finalQty": 85.5,
+      "forecast": 89.5,
+      "manualOverride": null,
+      "maxUnits": null,
+      "minUnits": null,
+      "recommended": 85.5,
+      "rounding": null,
+      "size": "S",
+      "statusReason": ""
+     },
+     {
+      "blocked": false,
+      "finalQty": 81.5,
+      "forecast": 86.5,
+      "manualOverride": null,
+      "maxUnits": null,
+      "minUnits": null,
+      "recommended": 81.5,
+      "rounding": null,
+      "size": "M",
+      "statusReason": ""
+     }
+    ],
+    "skuId": "REF3|BLK",
+    "skuName": "REF3 \u00e2\u20ac\u201d BLK",
+    "status": "pending"
+   },
+   {
+    "category": "Tops",
+    "confidence": "medium",
+    "currentScenarioTotal": 176.0,
+    "draftVersion": null,
+    "explainability": {
+     "confirmedOrders": {
+      "customerCount": 2,
+      "units": 0
+     },
+     "keySignals": {
+      "customerCluster": "Not modeled",
+      "depthPerCustomer": 352.0,
+      "diffusionRate": 1.0,
+      "scenarioMultiplier": 1.0
+     },
+     "nonVisitedDemand": {
+      "clusterProfile": "Not modeled",
+      "matchedCustomers": 0,
+      "units": 0
+     },
+     "probableReorders": {
+      "likelyCustomers": 0,
+      "reorderRate": 1.0,
+      "units": 0
+     }
+    },
+    "financialImpact": {
+     "budgetImpactPercent": 0,
+     "complete": true,
+     "expectedTurnover": 5280.0,
+     "grossMargin": 3168.0,
+     "marginPercent": 60.0,
+     "purchaseCost": 2004.0
+    },
+    "forecastRun": null,
+    "historicalSizes": {
+     "M": 346.0,
+     "S": 358.0
+    },
+    "locked": false,
+    "purchaseTotals": {
+     "base": 167.0,
+     "conservative": 0.0,
+     "optimistic": 343.0
+    },
+    "scenarios": {
+     "base": {
+      "confirmed": 0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 176.0,
+      "total": 176.0
+     },
+     "conservative": {
+      "confirmed": 0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 0,
+      "total": 0
+     },
+     "optimistic": {
+      "confirmed": 0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 352.0,
+      "total": 352.0
+     }
+    },
+    "sizeBreakdown": [
+     {
+      "blocked": false,
+      "finalQty": 85.5,
+      "forecast": 89.5,
+      "manualOverride": null,
+      "maxUnits": null,
+      "minUnits": null,
+      "recommended": 85.5,
+      "rounding": null,
+      "size": "S",
+      "statusReason": ""
+     },
+     {
+      "blocked": false,
+      "finalQty": 81.5,
+      "forecast": 86.5,
+      "manualOverride": null,
+      "maxUnits": null,
+      "minUnits": null,
+      "recommended": 81.5,
+      "rounding": null,
+      "size": "M",
+      "statusReason": ""
+     }
+    ],
+    "skuId": "REF3|WHT",
+    "skuName": "REF3 \u00e2\u20ac\u201d WHT",
+    "status": "pending"
+   },
+   {
+    "category": "Bottoms",
+    "confidence": "medium",
+    "currentScenarioTotal": 170,
+    "draftVersion": null,
+    "explainability": {
+     "confirmedOrders": {
+      "customerCount": 2,
+      "units": 0
+     },
+     "keySignals": {
+      "customerCluster": "Not modeled",
+      "depthPerCustomer": 510.0,
+      "diffusionRate": 1.0,
+      "scenarioMultiplier": 1.0
+     },
+     "nonVisitedDemand": {
+      "clusterProfile": "Not modeled",
+      "matchedCustomers": 0,
+      "units": 0
+     },
+     "probableReorders": {
+      "likelyCustomers": 0,
+      "reorderRate": 1.0,
+      "units": 0
+     }
+    },
+    "financialImpact": {
+     "budgetImpactPercent": 0,
+     "complete": true,
+     "expectedTurnover": 4250.0,
+     "grossMargin": 2550.0,
+     "marginPercent": 60.0,
+     "purchaseCost": 1610.0
+    },
+    "forecastRun": null,
+    "historicalSizes": {
+     "L": 528.0,
+     "M": 492.0
+    },
+    "locked": false,
+    "purchaseTotals": {
+     "base": 161.0,
+     "conservative": 0.0,
+     "optimistic": 331.0
+    },
+    "scenarios": {
+     "base": {
+      "confirmed": 0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 170,
+      "total": 170
+     },
+     "conservative": {
+      "confirmed": 0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 0,
+      "total": 0
+     },
+     "optimistic": {
+      "confirmed": 0,
+      "nonVisitedProjection": 0,
+      "probableReorders": 340,
+      "total": 340
+     }
+    },
+    "sizeBreakdown": [
+     {
+      "blocked": false,
+      "finalQty": 78.0,
+      "forecast": 82.0,
+      "manualOverride": null,
+      "maxUnits": null,
+      "minUnits": null,
+      "recommended": 78.0,
+      "rounding": null,
+      "size": "M",
+      "statusReason": ""
+     },
+     {
+      "blocked": false,
+      "finalQty": 83.0,
+      "forecast": 88.0,
+      "manualOverride": null,
+      "maxUnits": null,
+      "minUnits": null,
+      "recommended": 83.0,
+      "rounding": null,
+      "size": "L",
+      "statusReason": ""
+     }
+    ],
+    "skuId": "REF2|BLU",
+    "skuName": "REF2 \u00e2\u20ac\u201d BLU",
+    "status": "pending"
+   }
+  ]
+ ],
+ "/api/validation": [
+  200,
+  {
+   "approvalAvailable": true,
+   "approvalNotice": "Complete the financial and inventory inputs before requesting an approved export.",
+   "financialComplete": true,
+   "overrides": [],
+   "scenarioMetrics": {
+    "base": {
+     "budgetUsage": null,
+     "grossMargin": 60.0,
+     "purchaseCost": 9648.8,
+     "skusAtRisk": 0,
+     "totalUnits": 998.85
+    },
+    "conservative": {
+     "budgetUsage": null,
+     "grossMargin": null,
+     "purchaseCost": 0,
+     "skusAtRisk": 0,
+     "totalUnits": 0.0
+    },
+    "optimistic": {
+     "budgetUsage": null,
+     "grossMargin": 60.0,
+     "purchaseCost": 19843.6016,
+     "skusAtRisk": 0,
+     "totalUnits": 2054.7002
+    }
+   },
+   "skuCount": 12
+  }
+ ]
+}

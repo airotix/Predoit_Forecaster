@@ -15,136 +15,158 @@
   }
 }
 
+/*
+ * Preduit design tokens (UI mockups, built on the Mergco design system palette).
+ * Brand colours drive both the redesigned components (page, card, soft, line, fg-*, brand-*)
+ * and the shadcn variables (--primary, --border, ...) so older screens follow the same brand.
+ */
 @layer base {
   :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.141 0.005 285.823);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.141 0.005 285.823);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.141 0.005 285.823);
-    --primary: oklch(0.21 0.006 285.885);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.967 0.001 286.375);
-    --secondary-foreground: oklch(0.21 0.006 285.885);
-    --muted: oklch(0.967 0.001 286.375);
-    --muted-foreground: oklch(0.552 0.016 285.938);
-    --accent: oklch(0.967 0.001 286.375);
-    --accent-foreground: oklch(0.21 0.006 285.885);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.92 0.004 286.32);
-    --input: oklch(0.92 0.004 286.32);
-    --ring: oklch(0.705 0.015 286.067);
-    --chart-1: oklch(0.879 0.169 91.605);
-    --chart-2: oklch(0.769 0.188 70.08);
-    --chart-3: oklch(0.666 0.179 58.318);
-    --chart-4: oklch(0.555 0.163 48.998);
-    --chart-5: oklch(0.473 0.137 46.201);
-    --radius: 0.5rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.141 0.005 285.823);
-    --sidebar-primary: oklch(0.21 0.006 285.885);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.967 0.001 286.375);
-    --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-    --sidebar-border: oklch(0.92 0.004 286.32);
-    --sidebar-ring: oklch(0.705 0.015 286.067);
-  }
-  .dark {
-    --background: oklch(0.141 0.005 285.823);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.21 0.006 285.885);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.21 0.006 285.885);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.92 0.004 286.32);
-    --primary-foreground: oklch(0.21 0.006 285.885);
-    --secondary: oklch(0.274 0.006 286.033);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.274 0.006 286.033);
-    --muted-foreground: oklch(0.705 0.015 286.067);
-    --accent: oklch(0.274 0.006 286.033);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.552 0.016 285.938);
-    --chart-1: oklch(0.879 0.169 91.605);
-    --chart-2: oklch(0.769 0.188 70.08);
-    --chart-3: oklch(0.666 0.179 58.318);
-    --chart-4: oklch(0.555 0.163 48.998);
-    --chart-5: oklch(0.473 0.137 46.201);
-    --sidebar: oklch(0.21 0.006 285.885);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.274 0.006 286.033);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.552 0.016 285.938);
-  }
-}
+    color-scheme: light;
+    /* Type */
+    --font-display: 'Sora Variable', 'Sora', system-ui, sans-serif;
+    --font-ui: 'Outfit Variable', 'Outfit', 'Sora Variable', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+    /* Surfaces */
+    --page: #FAFAF7;
+    --card: #FFFFFF;
+    --soft: #F5F4F0;
+    --line: #EAE8E3;
+    --chrome: rgba(255, 255, 255, 0.92);
+    --champagne: #F8EFE0;
+    /* Text */
+    --fg-1: #020804;
+    --fg-2: #3D3D3D;
+    --fg-3: #6B6B6B;
+    --neutral-400: #949494;
+    --border-strong: #1A1A1A;
+    /* Brand: Inferno orange */
+    --brand: #F58220;
+    --brand-hover: #EA6C18;
+    --brand-soft: #FDE4D3;
+    --orange-50: #FFF4EA;
+    --orange-200: #FBCB9F;
+    --orange-700: #EA4F0A;
+    --orange-800: #C23F06;
+    --orange-tile: #F7A762;
+    /* Supporting */
+    --green-50: #E6F6EA;
+    --green-400: #24B34B;
+    --green-600: #0F7A35;
+    --purple-50: #F6EDFC;
+    --purple-600: #710193;
+    --danger: #E5392E;
+    --danger-soft: #FDECEA;
+    /* Effects */
+    --shadow-sm: 0 1px 3px rgba(2, 8, 4, 0.06);
+    --shadow-md: 0 6px 20px rgba(2, 8, 4, 0.08);
+    --shadow-primary: 0 8px 20px rgba(245, 130, 32, 0.32);
+    --glow: rgba(245, 130, 32, 0.28);
+    --overlay: rgba(2, 8, 4, 0.38);
 
-@layer base {
+    /* shadcn variables mapped onto the brand */
+    --background: var(--page);
+    --foreground: var(--fg-1);
+    --card-foreground: var(--fg-1);
+    --popover: var(--card);
+    --popover-foreground: var(--fg-1);
+    --primary: var(--brand);
+    --primary-foreground: #FFFFFF;
+    --secondary: var(--soft);
+    --secondary-foreground: var(--fg-1);
+    --muted: var(--soft);
+    --muted-foreground: var(--fg-3);
+    --accent: var(--orange-50);
+    --accent-foreground: var(--orange-800);
+    --destructive: var(--danger);
+    --destructive-foreground: #FFFFFF;
+    --border: var(--line);
+    --input: #DEDEDE;
+    --ring: var(--brand);
+    --radius: 0.875rem;
+    --chart-1: #F58220;
+    --chart-2: #24B34B;
+    --chart-3: #710193;
+    --chart-4: #F7A762;
+    --chart-5: #65C981;
+    --sidebar: var(--card);
+    --sidebar-foreground: var(--fg-2);
+    --sidebar-primary: var(--brand);
+    --sidebar-primary-foreground: #FFFFFF;
+    --sidebar-accent: var(--brand-soft);
+    --sidebar-accent-foreground: var(--orange-800);
+    --sidebar-border: var(--line);
+    --sidebar-ring: var(--brand);
+  }
+
+  .dark {
+    color-scheme: dark;
+    --page: #0C0E0D;
+    --card: #151816;
+    --soft: #1C201D;
+    --line: #272B28;
+    --chrome: rgba(21, 24, 22, 0.9);
+    --champagne: #2A2017;
+    --fg-1: #F2F2F0;
+    --fg-2: #C3C7C3;
+    --fg-3: #8F948F;
+    --border-strong: #E8E8E4;
+    --brand-soft: rgba(245, 130, 32, 0.16);
+    --orange-50: rgba(245, 130, 32, 0.12);
+    --orange-200: #7A4A22;
+    --orange-700: #F7A762;
+    --orange-800: #F7A762;
+    --green-50: rgba(36, 179, 75, 0.14);
+    --green-600: #65C981;
+    --purple-50: rgba(165, 27, 252, 0.16);
+    --purple-600: #C98BFF;
+    --danger-soft: rgba(229, 57, 46, 0.16);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+    --glow: rgba(245, 130, 32, 0.22);
+    --overlay: rgba(0, 0, 0, 0.6);
+    --input: #333833;
+  }
+
   * {
     @apply border-border;
   }
+  html {
+    scroll-padding-top: 5rem;
+  }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-page text-fg-1 font-sans;
+    -webkit-font-smoothing: antialiased;
   }
-}
-
-@layer base {
-  :root {
-    --background: #f8fafc;
-    --foreground: #0f172a;
-    --card: #ffffff;
-    --card-foreground: #0f172a;
-    --primary: #2563eb;
-    --primary-foreground: #ffffff;
-    --secondary: #f1f5f9;
-    --secondary-foreground: #334155;
-    --accent: #eff6ff;
-    --accent-foreground: #1d4ed8;
-    --border: #e2e8f0;
-    --input: #dbe3ee;
-    --ring: #3b82f6;
-    --destructive-foreground: #ffffff;
-    --radius: 0.75rem;
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
   }
-  .dark {
-    --background: #020617;
-    --foreground: #e2e8f0;
-    --card: #0f172a;
-    --card-foreground: #e2e8f0;
-    --primary: #3b82f6;
-    --primary-foreground: #ffffff;
-    --secondary: #1e293b;
-    --secondary-foreground: #e2e8f0;
-    --accent: #172554;
-    --accent-foreground: #bfdbfe;
-    --border: #263449;
-    --input: #334155;
-    --ring: #60a5fa;
+  button, a, input, select, summary {
+    -webkit-tap-highlight-color: transparent;
   }
-  html { scroll-padding-top: 5rem; }
-  body { -webkit-font-smoothing: antialiased; }
-  :focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
-  button, a, input, select, summary { -webkit-tap-highlight-color: transparent; }
-  input, select, button { transition: background-color 150ms, border-color 150ms, box-shadow 150ms; }
-  ::selection { background: #bfdbfe; color: #1e3a8a; }
+  input, select, button {
+    transition: background-color 150ms, border-color 150ms, box-shadow 150ms;
+  }
+  input::placeholder {
+    color: var(--fg-3);
+  }
+  ::selection {
+    background: var(--orange-200);
+    color: var(--fg-1);
+  }
 }
 
 @layer components {
-  .app-content h1 { font-size: clamp(1.5rem, 2vw, 1.875rem); line-height: 1.25; letter-spacing: -0.035em; font-weight: 650; }
-  .app-content h2, .app-content h3 { letter-spacing: -0.015em; }
+  /* :where keeps these defaults below Tailwind utilities, so redesigned headings can size themselves. */
+  .app-content :where(h1) { font-family: var(--font-display); font-size: clamp(1.5rem, 2vw, 1.875rem); line-height: 1.25; letter-spacing: -0.03em; font-weight: 700; }
+  .app-content :where(h2, h3) { letter-spacing: -0.015em; }
   .app-content :where(table) { font-variant-numeric: tabular-nums; }
-  .app-content :where(th) { color: #64748b; font-size: 0.75rem; font-weight: 550; }
+  .app-content :where(th) { color: var(--fg-3); font-size: 0.75rem; font-weight: 600; }
   .app-content :where(td) { line-height: 1.5; }
   .app-content :where(tbody tr) { transition: background-color 120ms; }
-  .app-content :where(tbody tr):hover { background-color: #f8fafc; }
-  .dark .app-content :where(tbody tr):hover { background-color: #172033; }
-  .dark .app-content .bg-white { background-color: #0f172a; }
+  .app-content :where(tbody tr):hover { background-color: var(--soft); }
+  .dark .app-content .bg-white { background-color: var(--card); }
   .app-content :where(select) { border-color: var(--input); border-radius: 0.5rem; }
   .app-content :where(summary) { list-style-position: outside; }
 }

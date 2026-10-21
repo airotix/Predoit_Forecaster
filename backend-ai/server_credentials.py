@@ -1,8 +1,9 @@
 """Read server-only Joolan settings without executing env-file contents."""
 import os
 from pathlib import Path
+import paths
 
-ENV_FILE=Path(__file__).resolve().parent/'.env'
+ENV_FILE=paths.ENV_FILE
 
 def settings(path=None,environ=None):
     values={};path=Path(path or ENV_FILE);environ=os.environ if environ is None else environ

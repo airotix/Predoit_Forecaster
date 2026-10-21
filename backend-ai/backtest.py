@@ -6,6 +6,7 @@ import sqlite3
 from pathlib import Path
 import pandas as pd
 from forecasting import rolling_backtest,KEYS
+from code_fingerprint import file_hashes
 
 
 def main():
@@ -44,8 +45,8 @@ def main():
     if any(h not in (1,3,6,12) for h in args.horizons) or args.folds<1:raise ValueError('Choose horizons 1, 3, 6 or 12 and a positive fold count.')
     result=dict(sourceRun=lineage.get('runId'),freshRun=lineage.get('freshRun'),trainingCutoff=lineage.get('cutoff'),
         evaluatedSeries=len(keys),sampled=args.series>0,catboostEnabled=not args.no_catboost,iterations=args.iterations,
-        engineHash=hashlib.sha256(Path(__file__).with_name('forecasting.py').read_bytes()).hexdigest(),
-        engineFiles={name:hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest() for name in ('forecasting.py','article_forecast.py','forecast_calibration.py','backtest.py')},
+        engineHash=file_hashes(['forecasting'])['forecasting.py'],
+        engineFiles=file_hashes(['forecasting','article_forecast','forecast_calibration','backtest']),
         limitations=['Revised historical snapshot with attached static product attributes, not an archive of ERP values known at each cutoff.','Missing launch predictions are scored as zero and reported separately.','These are model forecasts; operational booking floors and launch analogues require as-of order/assortment snapshots for independent evaluation.'],horizons={})
     output=Path(args.output);output.parent.mkdir(parents=True,exist_ok=True)
     for horizon in args.horizons:

@@ -6,6 +6,11 @@ from pathlib import Path
 import uuid
 import pandas as pd
 from config import DATA_FILE_PATH,FORECAST_HORIZON_MONTHS
+import paths
+
+BASE_DIR=paths.HOME
+# Sources whose combined hash identifies the code that produced a forecast (lineage.codeHash).
+CODE_MODULES=('forecasting','article_forecast','forecast_calibration','season_projection','launch_forecast','main','m7_recommendations','budgeting','purchase_prices','order_constraints','planning','purchase_draft','buying')
 
 def run_phase1(data_path=None):
     """Deployment entry point: only a newly activated API export may be used."""
@@ -27,7 +32,7 @@ def _run_phase1(data_path=None):
     from joolan import selected_pipeline_path,snapshot_summary
     from planning import active_plan,input_rows,inputs_fingerprint
     from ingestion import merge_config_csv_with_append
-    base=Path(__file__).resolve().parent
+    base=BASE_DIR
     conn=get_connection()
     try:
         _create_persistent_tables(conn)
@@ -158,8 +163,8 @@ def _run_phase1(data_path=None):
     lineage['runtimeVersions']={name:importlib.metadata.version(name) for name in ('pandas','numpy','scikit-learn')}
     try:lineage['runtimeVersions']['catboost']=importlib.metadata.version('catboost')
     except importlib.metadata.PackageNotFoundError:lineage['runtimeVersions']['catboost']=None
-    code_base=Path(__import__('forecasting').__file__).resolve().parent
-    lineage['codeHash']=hashlib.sha256(b''.join((code_base/name).read_bytes() for name in ('forecasting.py','article_forecast.py','forecast_calibration.py','season_projection.py','launch_forecast.py','main.py','m7_recommendations.py','budgeting.py','purchase_prices.py','order_constraints.py','planning.py','purchase_draft.py','buying.py'))).hexdigest()
+    from code_fingerprint import code_hash
+    lineage['codeHash']=code_hash(CODE_MODULES)
     lineage['uncertaintyDefinition']='Monthly ranges use earlier held-out residual pools when at least 30 comparable errors exist; otherwise uncalibrated. Season sums have no coverage guarantee. Confidence is an error-based evidence policy, not a probability.'
     lineage['assortment']=assortment_report
     lineage['qualitySummary']=dict(calibratedVariants=int(r.calibration_points.fillna(0).gt(0).sum()),uncalibratedVariants=int(r.calibration_points.fillna(0).eq(0).sum()),

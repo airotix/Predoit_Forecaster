@@ -1,0 +1,14 @@
+# Packages the live API and forecast pipeline import (used by the Docker image).
+# Verified: the full backend-ai test suite passes with only these installed.
+# requirements.txt is the superset for the archived SARIMA/SHAP scripts (m4_sarima, m5_catboost).
+pandas>=2.0.0
+numpy>=1.23.0
+catboost>=1.2
+scikit-learn>=1.2.0
+openpyxl>=3.0.0
+fastapi
+python-multipart
+python-dotenv>=1.0.0
+uvicorn[standard]
+PyJWT[crypto]>=2.8.0
+httpx>=0.27.0

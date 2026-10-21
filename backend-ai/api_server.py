@@ -14,6 +14,7 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
 from pathlib import Path
+import paths
 from typing import Optional, List, Dict, Any
 
 import pandas as pd
@@ -49,13 +50,14 @@ from ingestion import (
 
 _forecast_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="forecast")
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = paths.HOME
 OUTPUT_PATH = BASE_DIR / "output"
 RECO_PATH = OUTPUT_PATH / "recommendations.csv"
 MONTHLY_PATH = OUTPUT_PATH / "forecast_monthly_detail.csv"
 
 # Origins allowed for CORS (browser will send Origin: http://localhost:3000)
-CORS_ORIGINS = {"http://localhost:3000", "http://127.0.0.1:3000"}
+import access_settings
+CORS_ORIGINS = set(access_settings.CORS_ORIGINS)
 
 
 @asynccontextmanager
@@ -65,6 +67,12 @@ async def lifespan(application: FastAPI):
         _create_persistent_tables(conn)
         ensure_pipeline_schema(conn)
         ensure_joolan_schema(conn)
+        from auth_routes import ensure_schema as ensure_auth_schema
+        ensure_auth_schema(conn)
+        if access_settings.ALLOW_NON_LOCAL and not access_settings.auth_is_active():
+            __import__('logging').getLogger('preduit.access').warning(
+                'FORECASTER_ALLOW_NON_LOCAL is set while authentication is off: any client that can reach '
+                'this port is trusted. Publish the port to localhost only, or set FORECASTER_AUTH_ENABLED=true.')
         conn.execute("INSERT OR REPLACE INTO joolan_state VALUES('source_policy','fresh_only')")
         conn.execute("INSERT OR IGNORE INTO joolan_state VALUES('forecast_source','fresh')")
         conn.execute("UPDATE import_jobs SET status='error',error_message='Server restarted before completion; retry the job.',finished_at=? WHERE status='running'",(datetime.datetime.now(datetime.timezone.utc).isoformat(),))
@@ -102,6 +110,10 @@ from operating_scope import install as install_operating_scope
 install_operating_scope(app,lambda:get_connection())
 from automatic_forecast import install as install_automatic
 install_automatic(app,lambda:get_connection())
+from auth_routes import install as install_auth
+install_auth(app,lambda:get_connection())
+from admin_routes import install as install_admin
+install_admin(app,lambda:get_connection())
 
 
 def _cors_headers(origin: Optional[str]) -> dict:

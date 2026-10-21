@@ -1,45 +1,36 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import {
+  CheckCircleIcon,
+  CircleNotchIcon,
+  EnvelopeSimpleIcon,
+  IdentificationCardIcon,
+  InfoIcon,
+  KeyIcon,
+  ShieldCheckIcon,
+  UserIcon,
+  UsersThreeIcon,
+} from "@phosphor-icons/react";
 import AppShell from "@/components/layout/AppShell";
 import { useAuth } from "@/components/auth/AuthProvider";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  AlertCircle,
-  CheckCircle2,
-  Loader2,
-  Mail,
-  Shield,
-  User as UserIcon,
-  Users,
-} from "lucide-react";
+import { Notice, PageHeader, Pill, SelectField } from "@/components/ui/brand";
 import { cn } from "@/lib/utils";
 import { roleMeetsRequired, type PreduitRole } from "@/lib/auth/msalConfig";
 import { listUsers, updateUserRole, type ManagedUser } from "@/lib/api/auth";
 
 const ROLE_OPTIONS: PreduitRole[] = ["owner", "admin", "manager", "worker"];
 
-const ROLE_STYLES: Record<PreduitRole, string> = {
-  owner: "border-purple-500 text-purple-600 dark:text-purple-300",
-  admin: "border-blue-500 text-blue-600 dark:text-blue-300",
-  manager: "border-emerald-500 text-emerald-600 dark:text-emerald-300",
-  worker: "border-slate-400 text-slate-500 dark:text-slate-400",
+const ROLE_TONES: Record<PreduitRole, "plum" | "brand" | "success" | "neutral"> = {
+  owner: "plum",
+  admin: "brand",
+  manager: "success",
+  worker: "neutral",
 };
+
+const TAB_TRIGGER =
+  "h-10 gap-2 rounded-full px-[18px] text-sm font-semibold text-fg-2 shadow-none hover:text-fg-1 focus-visible:ring-0 focus-visible:shadow-[0_0_0_3px_rgba(245,130,32,0.35)] data-[state=active]:bg-card data-[state=active]:font-bold data-[state=active]:text-fg-1 data-[state=active]:shadow-card [&_svg]:h-[17px] [&_svg]:w-[17px]";
 
 export default function SettingsPage() {
   const { role } = useAuth();
@@ -47,34 +38,33 @@ export default function SettingsPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-4xl space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
-          <p className="mt-1 text-slate-500 dark:text-slate-400">
-            Manage your profile and, if you&apos;re an admin, your team&apos;s access.
-          </p>
-        </div>
+      <div className="mx-auto flex w-full max-w-[1040px] flex-col gap-6">
+        <PageHeader
+          eyebrow="Account & access"
+          title="Settings"
+          description={<>Manage your profile and, if you&apos;re an admin, your team&apos;s access.</>}
+        />
 
-        <Tabs defaultValue="profile" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="profile">
-              <UserIcon className="mr-2 h-4 w-4" />
+        <Tabs defaultValue="profile" className="flex flex-col gap-5">
+          <TabsList className="h-auto self-start rounded-full bg-soft p-1">
+            <TabsTrigger value="profile" className={TAB_TRIGGER}>
+              <UserIcon weight="bold" />
               Profile
             </TabsTrigger>
             {canManageUsers && (
-              <TabsTrigger value="users">
-                <Users className="mr-2 h-4 w-4" />
+              <TabsTrigger value="users" className={TAB_TRIGGER}>
+                <UsersThreeIcon weight="bold" />
                 User Management
               </TabsTrigger>
             )}
           </TabsList>
 
-          <TabsContent value="profile">
+          <TabsContent value="profile" className="mt-0 focus-visible:ring-0">
             <ProfileTab />
           </TabsContent>
 
           {canManageUsers && (
-            <TabsContent value="users">
+            <TabsContent value="users" className="mt-0 focus-visible:ring-0">
               <UserManagementTab />
             </TabsContent>
           )}
@@ -99,44 +89,45 @@ function ProfileTab() {
       : "—";
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Profile</CardTitle>
-        <CardDescription>Your account details.</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="flex items-center gap-4">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 text-2xl font-semibold text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-            {(name !== "—" ? name : email).charAt(0).toUpperCase()}
+    <section className="flex flex-col gap-6 rounded-[32px] border border-line bg-card p-6 shadow-card sm:p-8">
+      <div className="flex flex-col gap-1.5">
+        <h2 className="flex items-center gap-2.5 text-[22px] font-extrabold tracking-[-0.02em]">
+          <IdentificationCardIcon className="h-[22px] w-[22px] text-brand" />
+          Profile
+        </h2>
+        <p className="text-sm leading-relaxed text-fg-2">Your account details.</p>
+      </div>
+
+      <div className="flex items-center gap-4 rounded-3xl bg-champagne p-5">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-plum-50 font-display text-2xl font-bold text-plum-600">
+          {(name !== "—" ? name : email).charAt(0).toUpperCase()}
+        </div>
+        <div className="flex min-w-0 flex-col gap-1">
+          <div className="truncate font-display text-xl font-bold tracking-[-0.01em] text-fg-1">
+            {name}
           </div>
-          <div>
-            <div className="text-lg font-semibold text-slate-900 dark:text-white">
-              {name}
-            </div>
-            <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
-              <Mail className="h-3.5 w-3.5" />
-              {email}
-            </div>
+          <div className="flex min-w-0 items-center gap-1.5 text-sm text-fg-2">
+            <EnvelopeSimpleIcon className="h-4 w-4 shrink-0 text-fg-3" />
+            <span className="truncate">{email}</span>
           </div>
         </div>
+      </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Role">
-            <Badge variant="outline" className={cn("capitalize", ROLE_STYLES[role])}>
-              <Shield className="mr-1 h-3 w-3" />
-              {role}
-            </Badge>
-          </Field>
-          <Field label="Sign-in method">
-            <span className="text-sm text-slate-700 dark:text-slate-300">{methodLabel}</span>
-          </Field>
-        </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Field label="Role" icon={<ShieldCheckIcon className="h-[18px] w-[18px]" />}>
+          <Pill tone={ROLE_TONES[role]} className="capitalize">
+            {role}
+          </Pill>
+        </Field>
+        <Field label="Sign-in method" icon={<KeyIcon className="h-[18px] w-[18px]" />}>
+          <span className="text-[15px] font-semibold text-fg-1">{methodLabel}</span>
+        </Field>
+      </div>
 
-        <p className="rounded-lg bg-slate-50 p-3 text-xs text-slate-500 dark:bg-slate-900 dark:text-slate-400">
-          Your role determines what you can access. To change it, contact an administrator.
-        </p>
-      </CardContent>
-    </Card>
+      <Notice tone="info">
+        Your role determines what you can access. To change it, contact an administrator.
+      </Notice>
+    </section>
   );
 }
 
@@ -183,126 +174,135 @@ function UserManagementTab() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>User Management</CardTitle>
-        <CardDescription>
+    <section className="overflow-hidden rounded-[32px] border border-line bg-card shadow-card">
+      <div className="flex flex-col gap-1.5 border-b border-line px-6 py-6 sm:px-8">
+        <h2 className="flex items-center gap-2.5 text-[22px] font-extrabold tracking-[-0.02em]">
+          <UsersThreeIcon className="h-[22px] w-[22px] text-brand" />
+          User Management
+        </h2>
+        <p className="max-w-[760px] text-pretty text-sm leading-relaxed text-fg-2">
           Manage roles for email/password accounts. Microsoft SSO users are managed in
           Azure Entra ID.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {error && (
-          <div className="mb-4 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300">
-            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>{error}</span>
-          </div>
-        )}
+        </p>
+      </div>
 
-        {loading ? (
-          <div className="flex items-center justify-center py-12 text-slate-400">
-            <Loader2 className="h-5 w-5 animate-spin" />
-          </div>
-        ) : users.length === 0 ? (
-          <div className="py-12 text-center text-sm text-slate-500">
-            No local accounts yet.
-          </div>
-        ) : (
-          <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800">
-            <table className="w-full text-sm">
-              <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500 dark:bg-slate-900 dark:text-slate-400">
-                <tr>
-                  <th className="px-4 py-3 font-medium">User</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Last login</th>
-                  <th className="px-4 py-3 font-medium">Role</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {users.map((u) => {
-                  const isSelf =
-                    currentUser?.email?.toLowerCase() === u.email.toLowerCase();
-                  return (
-                    <tr key={u.email} className="hover:bg-slate-50 dark:hover:bg-slate-900/50">
-                      <td className="px-4 py-3">
-                        <div className="font-medium text-slate-900 dark:text-white">
-                          {u.name || u.email.split("@")[0]}
-                          {isSelf && (
-                            <span className="ml-2 text-xs font-normal text-slate-400">
-                              (you)
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-xs text-slate-500">{u.email}</div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <Badge
-                          variant="outline"
-                          className={cn(
-                            "capitalize",
-                            u.status === "active"
-                              ? "border-emerald-500 text-emerald-600"
-                              : "border-slate-400 text-slate-500"
-                          )}
+      {error && (
+        <div className="px-6 pt-5 sm:px-8">
+          <Notice tone="danger">{error}</Notice>
+        </div>
+      )}
+
+      {loading ? (
+        <div role="status" aria-label="Loading users" className="flex items-center justify-center py-14 text-fg-3">
+          <CircleNotchIcon className="h-6 w-6 animate-spin" />
+        </div>
+      ) : users.length === 0 ? (
+        <div className="py-14 text-center text-sm text-fg-3">No local accounts yet.</div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] text-sm">
+            <thead className="border-b border-line bg-page text-left text-[11px] font-bold uppercase tracking-[0.1em] text-fg-3">
+              <tr>
+                <th className="px-6 py-3 sm:px-8">User</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Last login</th>
+                <th className="px-6 py-3 sm:px-8">Role</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-line">
+              {users.map((u) => {
+                const isSelf =
+                  currentUser?.email?.toLowerCase() === u.email.toLowerCase();
+                const display = u.name || u.email.split("@")[0];
+                return (
+                  <tr key={u.email} className="transition-colors hover:bg-page">
+                    <td className="px-6 py-3.5 sm:px-8">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-plum-50 text-[13px] font-bold text-plum-600">
+                          {display.charAt(0).toUpperCase()}
+                        </span>
+                        <span className="flex min-w-0 flex-col">
+                          <span className="font-semibold text-fg-1">
+                            {display}
+                            {isSelf && (
+                              <span className="ml-2 text-xs font-normal text-fg-3">(you)</span>
+                            )}
+                          </span>
+                          <span className="truncate text-xs text-fg-3">{u.email}</span>
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <Pill tone={u.status === "active" ? "success" : "neutral"} className="capitalize">
+                        {u.status}
+                      </Pill>
+                    </td>
+                    <td className="px-4 py-3.5 font-mono text-[13px] text-fg-2">
+                      {u.last_login_at
+                        ? new Date(u.last_login_at).toLocaleDateString()
+                        : "Never"}
+                    </td>
+                    <td className="px-6 py-3.5 sm:px-8">
+                      <div className="flex items-center gap-2">
+                        <SelectField
+                          aria-label={`Role for ${u.email}`}
+                          wrapperClassName="w-36"
+                          className="h-10 capitalize"
+                          value={u.role}
+                          onChange={(e) => void handleRoleChange(u, e.target.value as PreduitRole)}
+                          disabled={isSelf || savingEmail === u.email}
                         >
-                          {u.status}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-3 text-slate-500">
-                        {u.last_login_at
-                          ? new Date(u.last_login_at).toLocaleDateString()
-                          : "Never"}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <Select
-                            value={u.role}
-                            onValueChange={(v) => handleRoleChange(u, v as PreduitRole)}
-                            disabled={isSelf || savingEmail === u.email}
-                          >
-                            <SelectTrigger className="w-32 capitalize">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {ROLE_OPTIONS.map((r) => (
-                                <SelectItem key={r} value={r} className="capitalize">
-                                  {r}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          {savingEmail === u.email && (
-                            <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
-                          )}
-                          {savedEmail === u.email && (
-                            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
+                          {ROLE_OPTIONS.map((r) => (
+                            <option key={r} value={r} className="capitalize">
+                              {r}
+                            </option>
+                          ))}
+                        </SelectField>
+                        {savingEmail === u.email && (
+                          <CircleNotchIcon aria-label="Saving" className="h-[18px] w-[18px] animate-spin text-fg-3" />
+                        )}
+                        {savedEmail === u.email && (
+                          <CheckCircleIcon weight="fill" aria-label="Saved" className="h-[18px] w-[18px] text-success-600" />
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-        <p className="mt-4 text-xs text-slate-400">
+      <div className="flex items-start gap-3 border-t border-line bg-page px-6 py-5 sm:px-8">
+        <InfoIcon className="mt-0.5 h-[18px] w-[18px] shrink-0 text-plum-600" />
+        <p className="text-pretty text-[13px] leading-relaxed text-fg-2">
           You can&apos;t change your own role. Owner and admin have full access; managers
           can override and approve; workers have view-only access.
         </p>
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  icon,
+  children,
+}: {
+  label: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="space-y-1.5">
-      <div className="text-xs font-medium uppercase tracking-wide text-slate-400">
-        {label}
+    <div className={cn("flex items-center gap-3.5 rounded-[20px] border border-line bg-card p-4")}>
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-brand-50 text-brand-700">
+        {icon}
+      </span>
+      <div className="flex min-w-0 flex-col gap-1.5">
+        <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-fg-3">{label}</div>
+        <div>{children}</div>
       </div>
-      <div>{children}</div>
     </div>
   );
 }

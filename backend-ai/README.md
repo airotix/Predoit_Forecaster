@@ -57,6 +57,16 @@ The active Python path needs pandas 2 or newer, NumPy, CatBoost, openpyxl, FastA
 
 Requests default to local-only access and trusted localhost browser origins. A shared deployment requires authenticated requests, HTTPS, an explicit origin policy and appropriate user permissions; the current browser UI is intended for local use. Do not expose this app publicly by changing only the bind address. `FORECASTER_API_TOKEN` enables the backend's shared-secret authorization check; it does not implement user roles.
 
+### Where files live
+
+All run-time files (`data/`, `output/`, the credentials `.env`) sit under one root, defined only in `paths.py`. By default that is the folder containing the code (`backend-ai/`), exactly as before. Set `FORECASTER_HOME` to keep them elsewhere, so moving or packaging the code never changes where saved Joolan data and credentials are found. `FORECASTER_DB_PATH` still overrides the serving database only. Background workers are started as `python -m automatic_worker` / `python -m fresh_worker` from the code folder and inherit the environment.
+
+### Authentication and roles
+
+Authentication is off by default (nothing changes). Set `FORECASTER_AUTH_ENABLED=true` and a strong `FORECASTER_AUTH_SECRET` to require sign-in: local email/password accounts (the first sign-up becomes owner; set `FORECASTER_AUTH_ALLOW_SIGNUP=false` afterwards) and optional Azure Entra SSO (`FORECASTER_AZURE_TENANT_ID`, `FORECASTER_AZURE_CLIENT_ID`). Roles: **worker** (dashboard, products, projection, status), **manager** (everything else read/write), **admin/owner** (Joolan exports, forecasts, ingestion, user management, backups). Routes not listed in `rbac.py` default to manager. With authentication on, bearer tokens replace the local-only rule; browser origins come from `FORECASTER_CORS_ORIGINS`. `FORECASTER_ALLOW_NON_LOCAL=1` is for containers behind a localhost-only port mapping and must not be combined with a public port while authentication is off.
+
+Operators: `POST /api/admin/db/backup` copies the serving, Joolan source and history databases to `data/backups` (`FORECASTER_BACKUP_DIR`, `FORECASTER_BACKUP_KEEP`); `GET /api/admin/db/health` runs integrity checks.
+
 ## Joolan customer orders
 
 1. In Setup, import the trade-document workbook or connect to Joolan's HTTPS Query API. The enseigne is `legend73`, not the MySQL username `joolan_legend73`. The API key needs Queries permission and stays in memory.

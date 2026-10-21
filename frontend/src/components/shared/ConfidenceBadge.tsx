@@ -17,18 +17,15 @@ const confidenceConfig: Record<
 > = {
   high: {
     label: "High",
-    className:
-      "bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800",
+    className: "border-transparent bg-success-50 text-success-600",
   },
   medium: {
     label: "Medium",
-    className:
-      "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800",
+    className: "border-transparent bg-brand-50 text-brand-800",
   },
   low: {
     label: "Low",
-    className:
-      "bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-950 dark:text-rose-300 dark:border-rose-800",
+    className: "border-transparent bg-danger-soft text-danger",
   },
 };
 
@@ -43,8 +40,9 @@ export default function ConfidenceBadge({
     <Badge
       variant="outline"
       className={cn(
+        "rounded-full font-bold",
         config.className,
-        size === "sm" ? "text-[10px] px-1.5 py-0" : "text-xs px-2 py-0.5"
+        size === "sm" ? "text-[10px] px-2 py-0" : "text-xs px-2.5 py-[3px]"
       )}
     >
       {showLabel ? config.label : (level ?? "m").charAt(0).toUpperCase()}

@@ -1,0 +1,22 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "demo-api",
+      "runtimeExecutable": "C:/Users/ALHameedComputers/Desktop/Predoit_Forecaster/.venv/Scripts/python.exe",
+      "runtimeArgs": [
+        "-B",
+        "C:/Users/ALHameedComputers/AppData/Local/Temp/claude/C--Users-ALHameedComputers-Desktop-Predoit-Forecaster/8e8f4c9d-e3bf-46f8-a3bb-93432c0f852c/scratchpad/run_demo_api.py",
+        "C:/Users/ALHameedComputers/AppData/Local/Temp/claude/C--Users-ALHameedComputers-Desktop-Predoit-Forecaster/8e8f4c9d-e3bf-46f8-a3bb-93432c0f852c/scratchpad/demo-home",
+        "C:/Users/ALHameedComputers/Desktop/Predoit_Forecaster/backend-ai"
+      ],
+      "port": 4000
+    },
+    {
+      "name": "frontend",
+      "runtimeExecutable": "npm.cmd",
+      "runtimeArgs": ["--prefix", "C:/Users/ALHameedComputers/Desktop/Predoit_Forecaster/frontend", "run", "dev"],
+      "port": 3000
+    }
+  ]
+}

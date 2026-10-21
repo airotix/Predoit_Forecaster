@@ -15,6 +15,11 @@ backend-ai/node_modules
 backend-ai/src
 backend-ai/__pycache__
 backend-ai/catboost_info
+backend-ai/tests
+backend-ai/output
+backend-ai/.env
+preduit-app
+preduit-engine
 **/node_modules
 **/.next
 

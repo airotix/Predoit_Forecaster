@@ -15,11 +15,19 @@ Conflicting forecast pages, season persistence and nullable financial/stock type
 - Dependency metadata retains MSAL and Vitest alongside the current forecasting UI dependencies. The Next.js configuration keeps standalone container output and separate development/production caches.
 - Main's Docker, Compose, deployment documents and CI are retained. The CI additionally tests the current `backend-ai` workflow.
 
-## Deployment follow-up required
+## Deployment (updated in migration Phase 1)
 
-**The existing Dockerfile still starts `preduit_app.api_server`, which is the older packaged API. It does not provide the new fresh-Joolan/catalogue/budget/automatic endpoints. Do not deploy the merged frontend with that image as if it were the current application.** Port the current endpoint/data contracts into the secured packaged runtime and verify them together before a container rollout.
+The `Dockerfile` and `docker-compose.yml` now build and run the current application, `backend-ai/api_server.py`
+(see [MIGRATION_PLAN.md](MIGRATION_PLAN.md)). The older `preduit-app`/`preduit-engine` packages are no longer built or
+deployed; they remain in the repository until Phase 5 removes them.
 
-The local `backend-ai` API remains a local development/pilot service. Retaining frontend login/role controls does not add the packaged backend's JWT verification or user-management endpoints to it. Do not enable shared/public access or rely on frontend controls as backend authorization. This merge does not remove the packaged backend's security checks or claim a production authentication migration.
+- Databases, Joolan exports and outputs live on the `preduit-backend-data` and `preduit-backend-output` volumes, mounted
+  at `/app/backend-ai/data` and `/app/backend-ai/output`. Volumes from the old image (`preduit-data`, `/data/forecast.db`) are not read.
+- Authentication and roles (worker, manager, admin/owner) are ported from `preduit-app` and are **off by default**. Set
+  `FORECASTER_AUTH_ENABLED=true` and `FORECASTER_AUTH_SECRET` to enable them; the frontend login and role controls are then
+  enforced by the backend. With authentication off the API stays local-only, so compose binds it to `127.0.0.1`.
+- Not ported on purpose: `/forecast/accuracy` and `/forecast/backtest` (they evaluated the retired SARIMA engine, not the live
+  forecaster), `/ingest/erp/status` and `/overrides/revert*` (no page uses them), and `/season-config` (replaced by `/seasons`).
 
 Existing client databases, environment keys and local training outputs are not rewritten by resolving source conflicts. Keep credentials and client data out of new source commits. The existing main history may contain generated artifacts; new ignore rules do not retroactively remove already tracked files.
 
