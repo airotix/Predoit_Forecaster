@@ -69,6 +69,39 @@ def line_totals(line):
                 marginRate=margin / turnover * 100 if margin is not None and turnover else None)
 
 
+def selling_price_updates(conn, ident):
+    """Preview current saved prices. Never change an existing PO on a read."""
+    doc = _read(conn, ident)
+    if doc['status'] not in ('draft', 'pending_validation'):
+        raise ValueError('Only editable PO drafts can refresh selling prices.')
+    from catalogue import price_map
+    catalogue = price_map(conn, doc['currency'])
+    try:
+        draft = purchase_draft.read(conn, doc['scenario'])
+    except (ValueError, KeyError):
+        draft = {}
+    matches = all(draft.get(k) == doc.get(k) for k in ('seasonId', 'forecastRun', 'sourceRun'))
+    saved = draft.get('resolvedInputs', {}) if matches and draft.get('currency') == doc['currency'] else {}
+    edits = {r['id']: r for r in draft.get('edits', [])} if saved else {}
+    changes = []; protected = 0
+    for line in doc['lines']:
+        if line['unitPrice'] != line['original']['unitPrice']:
+            protected += 1
+            continue
+        value = saved.get(line['id'], {}).get('price')
+        if 'unitPrice' in edits.get(line['id'], {}):
+            value = edits[line['id']]['unitPrice']
+        source = 'Saved Budget Tracker selling price'
+        if value is None:
+            value = catalogue.get((line['reference'], line['color'], line['size']), {}).get('selling')
+            source = 'Saved Catalogue selling price'
+        if value is not None and value != line['unitPrice']:
+            changes.append(dict(id=line['id'],reference=line['reference'],color=line['color'],size=line['size'],
+                                previous=line['unitPrice'],unitPrice=value,source=source))
+    return dict(version=doc['version'], changes=changes, protectedOverrides=protected,
+                notice='Preview only. Apply and save to update this PO. Manual PO prices are retained.')
+
+
 def native_unit(cost,fx):
     if cost is None:return None
     return float((Decimal(str(cost))*Decimal(str(fx['exchangeRate']))).quantize(Decimal('.000001'),rounding=ROUND_HALF_UP)) if fx else cost
@@ -304,6 +337,7 @@ def update(conn, ident, body):
             if field == 'sellThrough' and value > 100: raise ValueError('Sell-through must be between 0 and 100%.')
             by_id[edit['id']][field] = value
         line=by_id[edit['id']]
+        if 'unitPrice' in edit:line['sellingSource']='Manual PO selling-price assumption'
         if 'supplierUnitCost' in edit:line['unitCost']=budget_unit(line['supplierUnitCost'],line.get('fx'))
         elif 'unitCost' in edit:line['supplierUnitCost']=native_unit(line['unitCost'],line.get('fx'))
     status = body.get('status','draft')
@@ -347,6 +381,13 @@ def install(app, connection):
         try: return view(c,ident)
         except ValueError as e: raise HTTPException(409,str(e)) from None
         finally: c.close()
+
+    @app.get('/api/purchase-orders/{ident}/selling-prices')
+    def current_selling_prices(ident:str):
+        c = connection()
+        try:return selling_price_updates(c,ident)
+        except ValueError as e:raise HTTPException(409,str(e)) from None
+        finally:c.close()
 
     @app.post('/api/purchase-orders')
     def generate(body:dict=Body(...)):

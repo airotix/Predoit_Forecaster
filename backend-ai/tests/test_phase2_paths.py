@@ -150,16 +150,24 @@ class WorkerTests(unittest.TestCase):
     def test_real_launch_starts_a_worker_that_uses_the_data_home(self):
         """fresh_routes.launch spawns a detached child (no console on Windows); prove it started and ran."""
         import time
+        children = []
+        real_popen = subprocess.Popen
+        def start_child(*args, **kwargs):
+            child = real_popen(*args, **kwargs)
+            children.append(child)
+            return child
         with tempfile.TemporaryDirectory() as home:
             Path(home, 'data').mkdir()
-            with patch.dict(os.environ, {'FORECASTER_HOME': home}):
+            with patch.dict(os.environ, {'FORECASTER_HOME': home}), patch.object(fresh_routes.subprocess, 'Popen', side_effect=start_child):
                 fresh_routes.launch('nojob', 'unused-key')
             marker = Path(home, 'data', 'joolan_source.db')
             deadline = time.time() + 30
             while not marker.exists() and time.time() < deadline:
                 time.sleep(0.25)
             self.assertTrue(marker.exists(), 'the detached worker never reached its database')
-            time.sleep(1)  # let the child release its handle so the folder can be removed
+            # A fixed sleep races the actual worker exit on Windows and leaks a DB handle.
+            for child in children:
+                self.assertEqual(0, child.wait(timeout=30))
 
 
 class FingerprintTests(unittest.TestCase):

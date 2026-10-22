@@ -1,3 +1,4 @@
+import type {ArticleActivity} from '@/components/shared/ArticleActivity';
 import { apiClient } from './client';
 import { useSeasonStore } from '@/store/seasonStore';
 
@@ -36,6 +37,7 @@ export const fetchDashboard = () =>
 // ---------------------------------------------------------------------------
 
 export interface ProductRow {
+ activity?:ArticleActivity|null;
   skuId: string;
   name: string;
   category: string;
@@ -85,6 +87,7 @@ export const fetchProductSizeHistory=(reference:string,color:string)=>
 // ---------------------------------------------------------------------------
 
 export interface ProjectionRow {
+ activity?:ArticleActivity|null;
   projectionBasis?: 'season_bookings' | 'legacy_open_balances';
   skuId: string;
   skuName: string;
@@ -148,6 +151,7 @@ export const fetchBudget = (scenario?: string) =>
 // ---------------------------------------------------------------------------
 
 export interface RecommendationRow {
+ activity?:ArticleActivity|null;
   draftVersion?:number;
   forecastRun?:string;
   skuId: string;

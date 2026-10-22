@@ -73,7 +73,7 @@ def article_plan(rows, report):
         turnover=round(sum(r['orderTurnover'] or 0 for r in active),2) if complete else None
         margin=round(sum(r['orderGrossMargin'] or 0 for r in active),2) if complete else None
         rate=margin/turnover*100 if turnover else None
-        articles.append(dict(reference=reference,rowIds=[r['id'] for r in variants],forecast=sum(r['forecast'] for r in variants),
+        articles.append(dict(reference=reference,activity=variants[0].get('activity'),rowIds=[r['id'] for r in variants],forecast=sum(r['forecast'] for r in variants),
             quantity=sum(r['quantity'] or 0 for r in active),purchaseCost=cost,turnover=turnover,grossMargin=margin,marginRate=rate,
             quantityUnresolved=any(r['quantity'] is None for r in variants),
             inactiveConflict=any(r.get('purchasingBlocked') and (r['quantity'] is None or r['quantity']>0) for r in variants),
@@ -99,6 +99,7 @@ def article_plan(rows, report):
         else:
             remaining=round(remaining-a['purchaseCost'],2)
             a.update(status='included',reason=f"Expected margin {a['marginRate']:.1f}% meets the {s['targetMargin']:.1f}% target and all ordered sizes fit the draft allowance. Priority {rank} by gross margin per purchase cost, then forecast demand.")
+    articles.sort(key=lambda a:bool((a.get('activity') or {}).get('dormant')))
     included=[a for a in articles if a['status']=='included']
     return dict(articles=articles,capacity=capacity,remaining=remaining,purchaseCost=round(sum(a['purchaseCost'] for a in included),2),
         turnover=round(sum(a['turnover'] for a in included),2),grossMargin=round(sum(a['grossMargin'] for a in included),2),

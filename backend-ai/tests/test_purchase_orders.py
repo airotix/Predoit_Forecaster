@@ -107,6 +107,34 @@ class PurchaseOrderTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'read-only'):
             with self.c:po.update(self.c,ident,dict(version=2,supplier='other'))
 
+    def test_manual_selling_price_persists_and_fills_unknown_finances(self):
+        row=self.simulation['rows'][0]
+        row.update(quantity=3,orderUnitCost=79,orderUnitPrice=None)
+        ident=self.create(mode='selected')['created'][0]
+        before=self.view(ident)
+        self.assertIsNone(before['totals']['turnover'])
+        with self.c:po.update(self.c,ident,dict(version=1,edits=[dict(id=row['id'],unitPrice=129)],changeReason='Buyer selling price'))
+        saved=self.view(ident)
+        self.assertEqual(saved['totals']['purchaseCost'],237)
+        self.assertEqual(saved['totals']['turnover'],387)
+        self.assertEqual(saved['totals']['grossMargin'],150)
+        self.assertAlmostEqual(saved['totals']['marginRate'],150/387*100)
+        self.assertEqual(json.loads(self.c.execute('SELECT payload FROM supplier_purchase_orders WHERE id=?',(ident,)).fetchone()[0])['lines'][0]['unitPrice'],129)
+        self.assertNotIn('Some selling prices are missing for financial review.',saved['checks'])
+
+    def test_selling_price_refresh_is_preview_only_and_retains_po_overrides(self):
+        self.simulation['rows'][0]['orderUnitPrice']=None
+        ident=self.create(mode='fitting')['created'][0]
+        prices={('A','BLACK','M'):dict(selling=129),('A','BLACK','L'):dict(selling=130)}
+        with patch('catalogue.price_map',return_value=prices),patch('purchase_draft.read',return_value={}):
+            preview=po.selling_price_updates(self.c,ident)
+            self.assertEqual(len(preview['changes']),2)
+            self.assertIsNone(self.view(ident)['lines'][0]['unitPrice'])
+            with self.c:po.update(self.c,ident,dict(version=1,edits=[dict(id=self.simulation['rows'][0]['id'],unitPrice=150)],changeReason='Agreed price'))
+            preview=po.selling_price_updates(self.c,ident)
+            self.assertEqual(preview['protectedOverrides'],1)
+            self.assertEqual([r['size'] for r in preview['changes']],['L'])
+
     def test_source_changes_flag_but_never_replace_saved_po(self):
         ident=self.create()['created'][0];doc=self.view(ident,'different')
         self.assertTrue(doc['sourceChanged']);self.assertEqual(doc['lines'][0]['quantity'],4)

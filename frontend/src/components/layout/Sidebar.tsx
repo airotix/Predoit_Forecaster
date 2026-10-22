@@ -3,7 +3,7 @@ import Link from 'next/link';
 import {usePathname} from 'next/navigation';
 import {ArrowUpRightIcon,ChartLineUpIcon,SignOutIcon} from '@phosphor-icons/react';
 import {useUIStore} from '@/store/uiStore';
-import {navigationForRole,navigation as allNavigation} from './navigation';
+import {sidebarNavigationForRole,navigation as allNavigation} from './navigation';
 import {useAuth} from '@/components/auth/AuthProvider';
 import {roleMeetsRequired} from '@/lib/auth/msalConfig';
 import {cn} from '@/lib/utils';
@@ -31,7 +31,7 @@ export function NavItemLink({item,collapsed=false,onNavigate}:{item:NavItem;coll
 /** Grouped navigation used by the mobile drawer (settings included in its group). */
 export function NavigationLinks({onNavigate}:{onNavigate?:()=>void}){
  const {role}=useAuth();
- return <nav aria-label="Main navigation" className="flex flex-col gap-3.5">{groupNavigation(navigationForRole(role)).map(({group,items})=><div key={group} className="flex flex-col gap-0.5">
+ return <nav aria-label="Main navigation" className="flex flex-col gap-3.5">{groupNavigation(sidebarNavigationForRole(role)).map(({group,items})=><div key={group} className="flex flex-col gap-0.5">
   <span className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-fg-4">{group}</span>
   {items.map(item=><NavItemLink key={item.href} item={item} onNavigate={onNavigate}/>)}
  </div>)}</nav>;
@@ -44,7 +44,7 @@ export function initials(name:string){
 
 export default function Sidebar(){
  const {sidebarCollapsed}=useUIStore();const {role,user,account,logout}=useAuth();
- const collapsed=sidebarCollapsed;const items=navigationForRole(role);
+ const collapsed=sidebarCollapsed;const items=sidebarNavigationForRole(role);
  const settings=items.find(n=>n.href==='/settings');
  const name=user?.name||account?.name||account?.username||'My account';
  return <aside className={cn('sticky top-0 hidden h-screen shrink-0 flex-col border-r border-line bg-card transition-[width] duration-200 ease-[cubic-bezier(.22,1,.36,1)] lg:flex',collapsed?'w-[84px]':'w-[272px]')}>

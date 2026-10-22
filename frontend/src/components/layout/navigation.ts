@@ -16,3 +16,5 @@ export const navigation=[
  {label:'Settings & access',href:'/settings',group:'Workspace',description:'Manage your profile and team access.',icon:GearSixIcon},
 ];
 export const navigationForRole=(role:PreduitRole)=>navigation.filter(item=>roleMeetsRequired(role,routeMinRole(item.href)||'worker'));
+// Temporarily hide Seasonal Allocation in desktop and mobile sidebars.
+export const sidebarNavigationForRole=(role:PreduitRole)=>navigationForRole(role).filter(item=>item.href!=='/allocation');

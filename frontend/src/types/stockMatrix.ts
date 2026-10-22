@@ -42,6 +42,7 @@ export interface DetailedStockReport {
 }
 
 export interface SKUDetailedProjection {
+  warehouseStock?: WarehouseStockSnapshot | null;
   projectionBasis?: 'season_bookings' | 'legacy_open_balances';
   scenario?: string;
   skuId: string;
@@ -51,4 +52,15 @@ export interface SKUDetailedProjection {
   stockSummary: StockSummary;
   colorVariants: ColorStockData[];
   confidence: 'high' | 'medium' | 'low';
+}
+
+export interface JoolanStockColor {
+ color:string;stock:SizeData;toReceive:SizeData;clients:SizeData;
+ allocated:SizeData;theoretical:SizeData;available:SizeData;
+}
+export interface WarehouseStockSnapshot {
+ sourceRun:string;source:string;snapshotAt:string|null;warehouses:string[];
+ colors:JoolanStockColor[];totalVariants:number;completeVariants:number;missingVariants:number;
+ summary:Record<Exclude<keyof JoolanStockColor,'color'>,number|null>;
+ recordedSummary:Record<Exclude<keyof JoolanStockColor,'color'>,number|null>;
 }

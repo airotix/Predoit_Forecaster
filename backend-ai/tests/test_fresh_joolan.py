@@ -78,6 +78,21 @@ class FreshTests(unittest.TestCase):
         self.assertEqual(records[0]['CDE_four_qte'],'')
         self.assertTrue(all(r['Data_Source']=='joolan' for r in records))
         self.assertNotIn(b'never-save-this',self.path.read_bytes())
+
+    def test_full_stock_missing_report_fields_uses_coherent_query_snapshot(self):
+        self.data['stocks']=[dict(self.stock[0],En_Stock=9,Disponible=4,En_Commande=10,Theorique=-6,Attribue=5,Reliquat_Fournisseur=0)]
+        rid,run=self.export()
+        self.assertEqual(run['status'],'validated',run)
+        c=fresh.connect(self.path)
+        try:
+            inventory=list(fresh.rows(c,rid,'inventory'))
+            self.assertEqual(inventory[0]['En_Stock'],9)
+            self.assertEqual(inventory[0]['En_Commande'],10)
+            self.assertEqual(inventory[0]['Theorique'],-6)
+            metadata=json.loads(c.execute("SELECT metadata FROM datasets WHERE run_id=? AND dataset='inventory'",(rid,)).fetchone()[0])
+            self.assertEqual(metadata['source'],'query.do:stocks')
+            self.assertFalse(metadata['explicitZeroCoverage'])
+        finally:c.close()
         with closed_transaction(fresh.connect(self.path)) as c:
             self.assertNotIn('never-save-this',''.join(str(r) for r in c.iterdump()))
     def test_quota_resume_keeps_only_complete_pages_without_duplicates(self):

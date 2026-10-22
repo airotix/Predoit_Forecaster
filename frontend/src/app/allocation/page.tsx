@@ -1,4 +1,5 @@
 "use client";
+import ActivityBadge,{type ArticleActivity} from '@/components/shared/ArticleActivity';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import {ArrowRightIcon,ArrowsClockwiseIcon,CaretDownIcon,CheckCircleIcon,CircleIcon,DropIcon,FloppyDiskIcon,MagnifyingGlassIcon,SlidersHorizontalIcon,WarningIcon} from '@phosphor-icons/react';
@@ -13,7 +14,7 @@ import {useDataRefresh} from '@/hooks/useDataRefresh';
 
 interface Filters{startMonth:string;endMonth:string;codes:string[];}
 interface Variant{color:string;size:string;skus:string[];forecast:number|null;booked:number|null;}
-interface Article{reference:string;name:string;brand:string;code:string;forecast:number|null;knownForecast:number;forecastedVariants:number;missingVariants:number;colors:number;rows:Variant[];}
+interface Article{activity?:ArticleActivity|null;reference:string;name:string;brand:string;code:string;forecast:number|null;knownForecast:number;forecastedVariants:number;missingVariants:number;colors:number;rows:Variant[];}
 interface Allocation{allocation:Filters;saved:boolean;scenario:string;options:{code:string;articles:number;variants:number}[];published:{runId:string|null;startMonth:string|null;endMonth:string|null;matching:boolean};rows:Article[];total:number;summary:{articles:number;variants:number;forecastedVariants:number;missingVariants:number;knownForecastUnits:number;totalForecastUnits:number|null};notices:string[];}
 const currentCodes=['H26','FW27','P27','CORE','RECONDUIT'];
 const qty=(value:number|null)=>value==null?'—':value.toLocaleString(undefined,{maximumFractionDigits:2});
@@ -28,7 +29,7 @@ function ArticleAllocation({article}:{article:Article}){
   <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-4 px-[22px] py-[18px] hover:bg-page [&::-webkit-details-marker]:hidden">
    <div className="flex min-w-0 flex-col gap-1">
     <p className="flex items-center gap-2 text-xs text-fg-3">{article.brand} <span className="rounded-md bg-soft px-2 py-0.5 font-mono text-fg-2">{article.code}</span></p>
-    <h3 className="text-base font-bold"><span className="font-mono text-brand-700">{article.reference}</span> <span className="ml-1 font-semibold">{article.name}</span></h3>
+    <h3 className="text-base font-bold"><span className="font-mono text-brand-700">{article.reference}</span> <span className="ml-1 font-semibold">{article.name}</span></h3><ActivityBadge activity={article.activity}/>
     <p className="text-[13px] text-fg-3">{colors.length} colours · {article.rows.length} size variants</p>
    </div>
    <div className="flex items-center gap-[18px]">

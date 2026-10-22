@@ -1,4 +1,5 @@
 "use client";
+import ActivityBadge from '@/components/shared/ArticleActivity';
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import AppShell from "@/components/layout/AppShell";
@@ -230,8 +231,8 @@ export default function ProjectionPage() {
             <div className="text-sm leading-[1.55]">
               <p className="font-bold">Understanding Projections</p>
               <p className="mt-1 text-fg-2">
-                Click any row to see the detailed stock matrix with color and size breakdowns
-                from the ML forecasting model.
+                Open an article to compare its saved Joolan stock balances with
+                forecast demand and purchasing needs, by colour and size.
               </p>
             </div>
           </section>
@@ -272,7 +273,7 @@ export default function ProjectionPage() {
               {/* Header */}
               <div className={cn(ROW_GRID, "border-b border-line bg-page px-6 py-3 text-[11px] font-bold uppercase tracking-[0.1em] text-fg-3")}>
                 <div>SKU</div>
-                <div className="text-right">Order balance</div>
+                <div className="text-right">{projections[0]?.projectionBasis==='season_bookings'?'Season bookings':'Open order balance'}</div>
                 <div className="text-right">Additional forecast</div>
                 <div className="text-right">Non-visited</div>
                 <div className="text-right">Total</div>
@@ -305,7 +306,7 @@ export default function ProjectionPage() {
                           )}
                         </span>
                         <div className="flex min-w-0 flex-col gap-0.5">
-                          <p className="truncate font-mono text-sm font-bold">{projection.skuId}</p>
+                          <p className="truncate font-mono text-sm font-bold">{projection.skuId}</p><ActivityBadge activity={projection.activity}/>
                           <p className="truncate text-xs text-fg-3">{projection.category}</p>
                         </div>
                       </div>

@@ -655,7 +655,8 @@ def get_products(
             })
 
         from product_kpis import attach_history
-        return attach_history(conn,products)
+        from article_activity import attach
+        return attach(conn,attach_history(conn,products),lambda row:row['skuId'].split('|',1)[0])
     finally:
         conn.close()
 
@@ -744,7 +745,8 @@ def get_projections(
                 },
             })
 
-        return projections
+        from article_activity import attach
+        return attach(conn,projections,lambda row:row['skuId'].removeprefix('SKU-'))
     finally:
         conn.close()
 
@@ -946,7 +948,8 @@ def get_recommendations(
                 },
             })
 
-        return results
+        from article_activity import attach
+        return attach(conn,results,lambda row:row['skuId'].split('|',1)[0])
     finally:
         conn.close()
 

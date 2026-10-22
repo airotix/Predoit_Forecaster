@@ -9,7 +9,7 @@ def total(values):
     return round(sum(values), 4) if values and all(v is not None for v in values) else None
 
 
-def detail(conn, reference, scenario='base'):
+def detail(conn, reference, scenario='base', source_path=None):
     if scenario not in SCENARIOS:
         raise HTTPException(400, 'Unknown scenario.')
     cursor = conn.execute('SELECT * FROM recommendations WHERE reference=? ORDER BY couleur,taille', (reference,))
@@ -30,6 +30,8 @@ def detail(conn, reference, scenario='base'):
         for label, column in fields.items()}) for color, sizes in grouped.items()]
     stock = total(r.get('current_stock') for r in rows)
     incoming = total(r.get('pipeline_stock') for r in rows)
+    from stock_snapshot import read
+    warehouse_stock = read(conn, reference, {(color, size) for color, sizes in grouped.items() for size in sizes}, source_path)
     return dict(skuId='SKU-'+reference, skuName=first.get('designation') or reference,
         projectionBasis='season_bookings' if season_basis else 'legacy_open_balances',
         category=first.get('famille') or 'Unknown', scenario=scenario,
@@ -40,5 +42,5 @@ def detail(conn, reference, scenario='base'):
         stockSummary=dict(stockReel=stock, fournisseur=incoming,
             clientNegoce=total(r.get('confirmed_delivered') for r in rows),
             total=total([stock, incoming])),
-        colorVariants=variants,
+        colorVariants=variants, warehouseStock=warehouse_stock,
         confidence='low' if any(str(r.get('confidence','')).upper() not in ('HIGH','MEDIUM') for r in rows) else 'medium' if any(str(r.get('confidence','')).upper()=='MEDIUM' for r in rows) else 'high')

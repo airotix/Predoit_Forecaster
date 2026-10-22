@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 import tempfile
 
-KINDS={'budget-source','reorders'}
+KINDS={'budget-source','reorders','article-activity'}
 MAX_DECODED=256*1024*1024
 
 

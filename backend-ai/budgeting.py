@@ -375,6 +375,8 @@ def build_report(conn,scenario='base',path=None,sync_catalogue=True):
         knownTurnover=revenue_known,expectedTurnover=revenue_known if price_complete else None,knownGrossMargin=known_margin,grossMargin=known_margin if margin_complete else None,
         grossMarginPercent=known_margin/revenue_known*100 if margin_complete and revenue_known>0 else None,marginComplete=margin_complete,
         targetMargin=float(plan['targetMargin']),currency=plan['currency'],overBudget=bool(config['budgetConfigured'] and total>budget))
+    from article_activity import attach
+    attach(conn,rows)
     return dict(summary=summary,settings=config,season=plan,coverage=coverage,categories=category_report,rows=rows,purchaseOrders=ledger,
         supplierOptions=sorted({text(fresh.field(p,'Fournisseur')) for p in source['products'].values()}-{''}),
         fxPolicy=dict(baseCurrency=fx_policy.get('baseCurrency'),pairs={k:{field:v for field,v in p.items() if field!='samples'} for k,p in fx_policy.get('pairs',{}).items()}),

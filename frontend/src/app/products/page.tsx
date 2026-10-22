@@ -1,4 +1,5 @@
 "use client";
+import ActivityBadge from '@/components/shared/ArticleActivity';
 // @refresh reset
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
@@ -133,6 +134,8 @@ export default function ProductKPIsPage() {
       return true;
     })
     .sort((a, b) => {
+      const activityOrder=Number(!!a.activity?.dormant)-Number(!!b.activity?.dormant);
+      if(activityOrder)return activityOrder;
       const multiplier = sortOrder === "desc" ? -1 : 1;
       const left=a[sortBy],right=b[sortBy];
       if(left==null)return right==null?0:1;
@@ -269,7 +272,7 @@ export default function ProductKPIsPage() {
                   >
                     <td className="py-[13px] pl-6 pr-3.5">
                       <div className="flex flex-col gap-0.5">
-                        <p className="font-mono text-[13px] font-bold">{product.skuId.split('|')[0]}</p>
+                        <p className="font-mono text-[13px] font-bold">{product.skuId.split('|')[0]}</p><ActivityBadge activity={product.activity}/>
                         <p className="text-xs text-fg-2">{product.skuId.split('|')[1]}</p>
                         <p className="text-xs text-fg-3">{product.category}</p>
                       </div>

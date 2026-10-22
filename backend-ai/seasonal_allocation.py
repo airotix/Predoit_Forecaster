@@ -95,6 +95,8 @@ def listing(conn,start=None,end=None,codes=None,scenario='base',search='',offset
         complete=bool(rows) and len(known)==len(rows);subtotal=round(sum(v['forecast'] for v in known),4)
         known_variants+=len(known);total_variants+=len(rows);known_units+=subtotal;complete_articles+=int(complete)
         articles.append(dict(**fact,forecast=subtotal if complete else None,knownForecast=subtotal,forecastedVariants=len(known),missingVariants=len(rows)-len(known),colors=len({v['color'] for v in rows}),rows=rows))
+    from article_activity import attach
+    attach(conn,articles)
     notices=[]
     if unavailable:notices.append('Saved article codes are absent from the current catalogue: '+', '.join(unavailable)+'. Choose the available codes and save the updated selection.')
     if not source_matches:notices.append('The catalogue and published forecast use different Joolan snapshots. Refresh the forecast in Setup.')

@@ -569,6 +569,13 @@
   200,
   [
    {
+    "activity": {
+     "asOf": "2024-12-31",
+     "dormant": false,
+     "label": "Ordered within 2 years",
+     "lastCustomerOrder": "2024-12-05",
+     "status": "recent"
+    },
     "aiConfidence": "medium",
     "buyingCustomers": 2,
     "category": "Tops",
@@ -602,6 +609,13 @@
     "trainingCutoff": "2024-12"
    },
    {
+    "activity": {
+     "asOf": "2024-12-31",
+     "dormant": false,
+     "label": "Ordered within 2 years",
+     "lastCustomerOrder": "2024-12-05",
+     "status": "recent"
+    },
     "aiConfidence": "medium",
     "buyingCustomers": 2,
     "category": "Tops",
@@ -635,6 +649,13 @@
     "trainingCutoff": "2024-12"
    },
    {
+    "activity": {
+     "asOf": "2024-12-31",
+     "dormant": false,
+     "label": "Ordered within 2 years",
+     "lastCustomerOrder": "2024-12-05",
+     "status": "recent"
+    },
     "aiConfidence": "medium",
     "buyingCustomers": 2,
     "category": "Tops",
@@ -667,6 +688,13 @@
     "trainingCutoff": "2024-12"
    },
    {
+    "activity": {
+     "asOf": "2024-12-31",
+     "dormant": false,
+     "label": "Ordered within 2 years",
+     "lastCustomerOrder": "2024-12-05",
+     "status": "recent"
+    },
     "aiConfidence": "medium",
     "buyingCustomers": 2,
     "category": "Tops",
@@ -699,6 +727,13 @@
     "trainingCutoff": "2024-12"
    },
    {
+    "activity": {
+     "asOf": "2024-12-31",
+     "dormant": false,
+     "label": "Ordered within 2 years",
+     "lastCustomerOrder": "2024-12-05",
+     "status": "recent"
+    },
     "aiConfidence": "medium",
     "buyingCustomers": 2,
     "category": "Bottoms",
@@ -736,6 +771,13 @@
   200,
   [
    {
+    "activity": {
+     "asOf": "2024-12-31",
+     "dormant": false,
+     "label": "Ordered within 2 years",
+     "lastCustomerOrder": "2024-12-05",
+     "status": "recent"
+    },
     "category": "Tops",
     "confidence": "medium",
     "explainability": {
@@ -785,6 +827,13 @@
     "skuName": "REF1"
    },
    {
+    "activity": {
+     "asOf": "2024-12-31",
+     "dormant": false,
+     "label": "Ordered within 2 years",
+     "lastCustomerOrder": "2024-12-05",
+     "status": "recent"
+    },
     "category": "Tops",
     "confidence": "medium",
     "explainability": {
@@ -834,6 +883,13 @@
     "skuName": "REF3"
    },
    {
+    "activity": {
+     "asOf": "2024-12-31",
+     "dormant": false,
+     "label": "Ordered within 2 years",
+     "lastCustomerOrder": "2024-12-05",
+     "status": "recent"
+    },
     "category": "Bottoms",
     "confidence": "medium",
     "explainability": {
@@ -888,6 +944,13 @@
   200,
   [
    {
+    "activity": {
+     "asOf": "2024-12-31",
+     "dormant": false,
+     "label": "Ordered within 2 years",
+     "lastCustomerOrder": "2024-12-05",
+     "status": "recent"
+    },
     "category": "Tops",
     "confidence": "medium",
     "currentScenarioTotal": 269.1807,
@@ -997,6 +1060,13 @@
     "status": "pending"
    },
    {
+    "activity": {
+     "asOf": "2024-12-31",
+     "dormant": false,
+     "label": "Ordered within 2 years",
+     "lastCustomerOrder": "2024-12-05",
+     "status": "recent"
+    },
     "category": "Tops",
     "confidence": "medium",
     "currentScenarioTotal": 264.6693,
@@ -1106,6 +1176,13 @@
     "status": "pending"
    },
    {
+    "activity": {
+     "asOf": "2024-12-31",
+     "dormant": false,
+     "label": "Ordered within 2 years",
+     "lastCustomerOrder": "2024-12-05",
+     "status": "recent"
+    },
     "category": "Tops",
     "confidence": "medium",
     "currentScenarioTotal": 176.0,
@@ -1202,6 +1279,13 @@
     "status": "pending"
    },
    {
+    "activity": {
+     "asOf": "2024-12-31",
+     "dormant": false,
+     "label": "Ordered within 2 years",
+     "lastCustomerOrder": "2024-12-05",
+     "status": "recent"
+    },
     "category": "Tops",
     "confidence": "medium",
     "currentScenarioTotal": 176.0,
@@ -1298,6 +1382,13 @@
     "status": "pending"
    },
    {
+    "activity": {
+     "asOf": "2024-12-31",
+     "dormant": false,
+     "label": "Ordered within 2 years",
+     "lastCustomerOrder": "2024-12-05",
+     "status": "recent"
+    },
     "category": "Bottoms",
     "confidence": "medium",
     "currentScenarioTotal": 170,

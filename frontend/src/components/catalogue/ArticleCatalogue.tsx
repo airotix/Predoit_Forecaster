@@ -1,11 +1,12 @@
 "use client";
+import ActivityBadge,{type ArticleActivity} from '@/components/shared/ArticleActivity';
 import {useState} from 'react';
 import {BookOpenIcon,CaretDownIcon,CaretUpIcon,DropIcon} from '@phosphor-icons/react';
 import StatusControl,{StatusBadge,type CatalogueStatus,type StatusChange} from './StatusControl';
 import type {SupplierFX} from '@/lib/api/budget';
 import {cn} from '@/lib/utils';
 export interface OrderPriceEvidence {supplier?:string;customer?:string;orderId?:string;orderNumber?:string;orderDate?:string;currency:string;price?:number;unitCost?:number;method?:string;matchLevel?:string;matchedVariant?:string[];reason?:string|null;cutoff:string;previousPrice?:number|null;changedAt?:string;fx?:SupplierFX;}
-export interface CatalogueSKU{sku:string;reference:string;color:string;size:string;name:string;brand:string;category:string;supplier:string;purchase:number|null;selling:number|null;purchaseSource:string;sellingSource:string;updatedAt:string|null;purchasePriceDetails?:OrderPriceEvidence|null;sellingPriceDetails?:OrderPriceEvidence|null;status?:CatalogueStatus|null;}
+export interface CatalogueSKU{activity?:ArticleActivity|null;sku:string;reference:string;color:string;size:string;name:string;brand:string;category:string;supplier:string;purchase:number|null;selling:number|null;purchaseSource:string;sellingSource:string;updatedAt:string|null;purchasePriceDetails?:OrderPriceEvidence|null;sellingPriceDetails?:OrderPriceEvidence|null;status?:CatalogueStatus|null;}
 function Evidence({row,side,disabled,reset}:{row:CatalogueSKU;side:'purchase'|'selling';disabled:boolean;reset:(row:CatalogueSKU,side:'purchase'|'selling')=>void}){
  const [open,setOpen]=useState(false);
  const evidence=side==='purchase'?row.purchasePriceDetails:row.sellingPriceDetails;
@@ -49,7 +50,7 @@ export default function ArticleCatalogue({rows,busy,statusDisabled,value,edit,ed
   return <div key={reference} className={cn('overflow-hidden rounded-[20px] border bg-card',isOpen?'border-brand-200':'border-line')}>
    <button type="button" aria-expanded={isOpen} onClick={()=>setOpen(o=>({...o,[reference]:!isOpen}))} className={cn('flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-fg-1 hover:bg-soft',isOpen?'bg-page':'bg-card')}>
     <span className="flex min-w-0 flex-col gap-1">
-     <span className="flex flex-wrap items-baseline gap-2.5"><span className="font-mono text-sm font-bold text-brand-700">{reference}</span><span className="text-base font-bold">{first.name}</span></span>
+     <span className="flex flex-wrap items-baseline gap-2.5"><span className="font-mono text-sm font-bold text-brand-700">{reference}</span><span className="text-base font-bold">{first.name}</span><ActivityBadge activity={first.activity}/></span>
      <span className="text-[13px] text-fg-3">{Array.from(new Set(variants.map(r=>r.brand))).join(', ')} · {first.category} · {colours.size} colours · {variants.length} SKUs</span>
     </span>
     <span className="flex shrink-0 items-center gap-3"><StatusBadge active={first.status?.articleActive}/><span className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-card">{isOpen?<CaretUpIcon weight="bold" className="h-[13px] w-[13px]"/>:<CaretDownIcon weight="bold" className="h-[13px] w-[13px]"/>}</span></span>

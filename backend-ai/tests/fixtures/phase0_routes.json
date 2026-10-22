@@ -185,6 +185,10 @@
  ],
  [
   "GET",
+  "/api/purchase-orders/{ident}/selling-prices"
+ ],
+ [
+  "GET",
   "/api/purchase-orders/{ident}/validation"
  ],
  [

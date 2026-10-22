@@ -729,6 +729,9 @@ def populate_database(pipeline_results):
 def _insert_order_ledger(conn,df):
     import collections,hashlib,json
     from planning import ensure_schema
+    from article_activity import context,observe,publish_cache
+    _,activity_through=context(conn)
+    activity_dates={}
     conn.execute('DELETE FROM order_lines')
     occurrence=collections.Counter()
     rows=[]
@@ -737,5 +740,7 @@ def _insert_order_ledger(conn,df):
         occurrence[identity]+=1
         key=hashlib.sha256(json.dumps([identity,occurrence[identity]]).encode()).hexdigest()
         payload={k:(None if pd.isna(v) else str(v) if isinstance(v,(pd.Timestamp,pd.Period)) else v) for k,v in row.items()}
+        observe(activity_dates,payload,activity_through)
         rows.append((key,json.dumps(payload,default=str)))
     conn.executemany('INSERT INTO order_lines VALUES(?,?)',rows)
+    publish_cache(conn,activity_dates)

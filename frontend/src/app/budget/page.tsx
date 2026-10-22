@@ -11,6 +11,7 @@ import ArticlePlanner from '@/components/budget/ArticlePlanner';
 import {useRouter} from 'next/navigation';
 import {purchaseOrdersApi} from '@/lib/api/purchaseOrders';
 import {updateBuyingEdit} from '@/lib/budgetEdits';
+import {previewBuyingRows} from '@/lib/buyingPreview';
 import {useSeasonStore} from '@/store/seasonStore';
 import {useDataRefresh} from '@/hooks/useDataRefresh';
 import {budgetApi,type BuyingSimulation,type BuyingEdit,type BuyingRow} from '@/lib/api/budget';
@@ -37,7 +38,7 @@ export default function BuyingPlan(){
  const percent=(v:number|null|undefined)=>v==null?'—':`${v.toFixed(1)}%`;
  const report=simulation?.context;const summary=simulation?.summary;const covered=simulation?.covered;
  function edit(row:BuyingRow,name:keyof BuyingEdit,value:string){if(name==='sellThrough'&&value.trim()==='')return;setEdits(prev=>({...prev,[row.id]:updateBuyingEdit(prev[row.id],row,name,value)}));setDirty(true);}
- const reviewRows=simulation?.rows.filter(r=>selected.includes(r.id))||[];
+ const reviewRows=previewBuyingRows(simulation?.rows||[],edits).filter(r=>selected.includes(r.id));
  const reviewArticles=new Set(reviewRows.map(r=>r.reference)).size;
  const reviewChecks=Array.from(new Set(reviewRows.flatMap(r=>r.blockers).filter(check=>check!=='Select a Joolan supplier price'&&check!=='Price assumptions are simulation only')));
  const reviewTotal=(key:'orderCost'|'orderTurnover'|'orderGrossMargin')=>reviewRows.length&&reviewRows.every(r=>r[key]!=null)?reviewRows.reduce((n,r)=>n+(r[key]||0),0):null;

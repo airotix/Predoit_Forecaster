@@ -94,12 +94,14 @@ def listing(conn,currency,search='',brand='',offset=0,limit=50,grouped=False,sta
         from catalogue_status import sync_sources
         sync_sources(conn)
         where.append('s.sku IN (SELECT sku FROM catalogue_effective_status WHERE active '+('IS NULL' if status=='unknown' else '= '+('1' if status=='active' else '0'))+')')
+    from article_activity import catalogue_sort,attach
+    activity_order=catalogue_sort(conn)
     query=' FROM catalogue_skus s LEFT JOIN catalogue_prices p ON p.sku=s.sku AND p.currency=? WHERE '+' AND '.join(where)
     total=conn.execute('SELECT COUNT(*)'+query,params).fetchone()[0]
     sku_total=total
     if grouped:
         total=conn.execute('SELECT COUNT(DISTINCT s.reference)'+query,params).fetchone()[0]
-        references=[r[0] for r in conn.execute('SELECT DISTINCT s.reference'+query+' ORDER BY s.reference LIMIT ? OFFSET ?',(*params,limit,offset))]
+        references=[r[0] for r in conn.execute('SELECT DISTINCT s.reference'+query+' ORDER BY '+activity_order+',s.reference LIMIT ? OFFSET ?',(*params,limit,offset))]
         # Paginate articles, then fetch every colour and size in each article.
         # A colour/size search finds the article without truncating its breakdown.
         query=' FROM catalogue_skus s LEFT JOIN catalogue_prices p ON p.sku=s.sku AND p.currency=? WHERE s.current=1 AND s.reference IN ('+','.join('?' for _ in references)+')'
@@ -107,9 +109,10 @@ def listing(conn,currency,search='',brand='',offset=0,limit=50,grouped=False,sta
         if brand:query+=' AND s.brand=?';params.append(brand)
         suffix=' ORDER BY s.reference,s.color,s.size,s.sku'
     else:
-        suffix=' ORDER BY s.reference,s.color,s.size,s.sku LIMIT ? OFFSET ?'
+        suffix=' ORDER BY '+activity_order+',s.reference,s.color,s.size,s.sku LIMIT ? OFFSET ?'
         params=[*params,limit,offset]
     rows=[dict(zip(('sku','reference','color','size','name','brand','category','supplier','purchase','selling','purchaseSource','sellingSource','updatedAt'),r)) for r in conn.execute('SELECT s.sku,s.reference,s.color,s.size,s.name,s.brand,s.category,s.supplier,p.purchase,p.selling,p.purchase_source,p.selling_source,p.updated_at'+query+suffix,params)]
+    attach(conn,rows)
     evidence={}
     if rows and conn.execute("SELECT 1 FROM sqlite_master WHERE name='catalogue_order_prices'").fetchone():
         page_skus=[r['sku'] for r in rows]

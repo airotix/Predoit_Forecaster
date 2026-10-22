@@ -28,7 +28,7 @@ REQUIRED_FIELDS={
 FIELD_CONTRACT={
  'orders':dict(source='query.do: negoce_entetes + negoce_lignes',fields=['Entete','Ligne','Date','Nature','Client','Magasin','Produit','Couleur','Taille','Quantite','Quantite_Livree','Quantite_Annulee','Statut','Date_Livraison_Souhaitee','Date_Livraison_Prevue']),
  'catalogue':dict(source='query.do: produits + skus (includes non-ecommerce products)',fields=['Produit','Couleur','Taille','Sku','EAN','Designation','Saison','Collection','Marque','Famille','Modele','Matiere','Actif','Fournisseur','Conditionnement_Achat','Prix_Achat','Prix_Vente','Devise']),
- 'inventory':dict(source='GET image-full-stocks.do',fields=['Magasin','Produit','Couleur','Taille','Sku','En_Stock','Disponible','En_Reservation','Attribue','En_Preparation','En_Livraison','Reliquat_Fournisseur','En_BL']),
+ 'inventory':dict(source='GET image-full-stocks.do or query.do:stocks (live discovered columns)',fields=['Magasin','Produit','Couleur','Taille','Sku','En_Stock','Disponible','En_Commande','Attribue','Theorique','En_Reservation','En_Preparation','En_Livraison','Reliquat_Fournisseur','En_BL']),
  'supply':dict(source='query.do: live schema discovery; mappings require review',fields=['Fournisseur','Magasin','Produit','Couleur','Taille','Quantite','Quantite_Livree','Date_Livraison','Statut','Prix_Achat','Devise']),
 }
 
@@ -214,22 +214,26 @@ def fetch_inventory(c,rid,client,key,config,schema,stock_fetch):
     The SQL table may be sparse. Missing warehouse/SKU rows remain unknown;
     only the dedicated full-stock endpoint promises explicit zero rows.
     """
+    names={str(col['name']).lower() for col in schema.get('stocks',[])}
     try:
         stock=stock_fetch(key,config)
-        return iter(stock),dict(source='image-full-stocks.do',explicitZeroCoverage=True,fetchedAt=now())
     except ValueError as error:
-        names={str(col['name']).lower() for col in schema.get('stocks',[])}
-        required={'magasin','produit','couleur','taille','en_stock','disponible','en_reservation'}
-        if not required<=names:raise error
-        update(c,rid,phase='Stock endpoint unavailable; downloading fresh stock through Query API')
-        # The Query API permission already grants read access to these tables.
-        # Only selected stores and brands are read; no old stock cache is used.
-        export_table(c,rid,client,'stocks',config)
-        meta=json.loads(c.execute("SELECT metadata FROM datasets WHERE run_id=? AND dataset='stocks'",(rid,)).fetchone()[0])
-        previous=c.execute("SELECT metadata FROM datasets WHERE run_id=? AND dataset='inventory'",(rid,)).fetchone()
-        captured=meta.get('completedAt') or (json.loads(previous[0]).get('fetchedAt') if previous else None)
-        return rows(c,rid,'stocks'),dict(source='query.do:stocks',explicitZeroCoverage=False,
-            fetchedAt=captured,endpointWarning=str(error)[:400],notice='Missing stock rows are unknown, not assumed zero.')
+        endpoint_warning=str(error)
+    else:
+        # Endpoint versions may omit report fields that exist in the SQL schema.
+        # Prefer one coherent query snapshot over mixing two capture times.
+        if not {'en_commande','theorique'}<=names or all(field(r,'En_Commande') is not None and field(r,'Theorique') is not None for r in stock):
+            return iter(stock),dict(source='image-full-stocks.do',explicitZeroCoverage=True,fetchedAt=now())
+        endpoint_warning='Full-stock endpoint omitted En_Commande/Theorique; using the complete discovered stock columns.'
+    required={'magasin','produit','couleur','taille','en_stock','disponible','en_reservation'}
+    if not required<=names:raise ValueError(endpoint_warning)
+    update(c,rid,phase='Downloading stock report balances through Query API')
+    export_table(c,rid,client,'stocks',config)
+    meta=json.loads(c.execute("SELECT metadata FROM datasets WHERE run_id=? AND dataset='stocks'",(rid,)).fetchone()[0])
+    previous=c.execute("SELECT metadata FROM datasets WHERE run_id=? AND dataset='inventory'",(rid,)).fetchone()
+    captured=meta.get('completedAt') or (json.loads(previous[0]).get('fetchedAt') if previous else None)
+    return rows(c,rid,'stocks'),dict(source='query.do:stocks',explicitZeroCoverage=False,
+        fetchedAt=captured,endpointWarning=endpoint_warning[:400],notice='Missing stock rows are unknown, not assumed zero.')
 
 def number(value,allow_negative=False):
     if value is None or isinstance(value,bool) or str(value).strip()=='':raise ValueError('Missing numeric value')
@@ -508,7 +512,7 @@ def run_export(rid,key,path=None,client_factory=Client,stock_fetch=full_stock,re
         report['inventorySource']=inventory_meta['source']
         report['inventoryAsOf']=inventory_meta.get('fetchedAt')
         if audit:report['exportAudit']=audit
-        if inventory_meta.get('endpointWarning'):report['warnings'].append('Stock endpoint unavailable; fresh Query API balances used. Missing warehouse/SKU rows remain unknown.')
+        if inventory_meta.get('endpointWarning'):report['warnings'].append('Fresh Query API stock balances used: '+inventory_meta['endpointWarning']+' Missing warehouse/SKU rows remain unknown.')
         update(c,rid,status='validated' if report['readyForForecast'] else 'needs_mapping',phase='Review data contract',report=encode(report))
     except SourceChangedError:
         update(c,rid,status='needs_credentials',phase='Source changed; automatic repair required',error='Source changed during export. Retry the affected saved table before forecasting.')

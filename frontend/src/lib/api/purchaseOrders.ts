@@ -26,7 +26,9 @@ export interface POValidationBudget {currency:string;amount:number;targetMargin:
 export interface POValidation {order:PurchaseOrder;blockers:string[];warnings:string[];budget:POValidationBudget;source:{runId?:string;historyThrough?:string};}
 export type POEdit=Pick<POLine,'id'> & Partial<Pick<POLine,'quantity'|'unitCost'|'unitPrice'|'sellThrough'|'supplierUnitCost'>>;
 export type POChanges=Partial<Pick<PurchaseOrder,'supplier'|'orderDate'|'deliveryDate'|'shipTo'|'notes'|'changeReason'|'status'>>&{version:number;edits?:POEdit[]};
+export interface SellingPricePreview {version:number;changes:{id:string;reference:string;color:string;size:string;previous:number|null;unitPrice:number;source:string}[];protectedOverrides:number;notice:string;}
 export const purchaseOrdersApi={
+ sellingPrices:(id:string)=>apiClient.get<SellingPricePreview>(`/purchase-orders/${id}/selling-prices`),
  list:(seasonId:string,scenario:string)=>apiClient.get<{orders:POSummary[];suppliers:string[]}>('/purchase-orders',{season_id:seasonId,scenario}),
  read:(id:string)=>apiClient.get<PurchaseOrder>(`/purchase-orders/${id}`),
  create:(draft:BuyingSimulation,mode:'all'|'fitting'|'selected')=>apiClient.post<{created:string[];existing:string[];skippedVariants:number;notice:string}>('/purchase-orders',{scenario:draft.scenario,version:draft.draft?.version,forecastRun:draft.draft?.forecastRun,revision:draft.revision,mode}),
